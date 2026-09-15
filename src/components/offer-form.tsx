@@ -121,11 +121,15 @@ export function OfferForm({
         </div>
         {autoChain ? (
           <p className="sm:col-span-2 text-sm text-muted">
-            Posting {coin}. If this wallet holds ≥ {TCTC_GRANT.toLocaleString()} TCTC,
-            you’re on the desk automatically.
+            Posting {coin}. ≥ {TCTC_GRANT.toLocaleString()} TCTC on this wallet
+            opens the desk. No TCTC? Use a desk grant on your Discord name.
           </p>
         ) : (
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-2 grid gap-2">
+            <p className="text-sm text-muted">
+              {coin} doesn’t live on the TCTC chains. Door 2: desk grant on
+              this Discord name after we talk. TCTC wallet is optional extra.
+            </p>
             <TctcFields />
           </div>
         )}

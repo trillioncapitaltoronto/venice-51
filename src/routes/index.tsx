@@ -33,8 +33,8 @@ function Home() {
           Price in BCH. Books look like an exchange — bids left, asks right.
           Post KAS, KDA, or NEXA from a wallet that holds ≥{" "}
           {TCTC_GRANT.toLocaleString()} TCTC and you’re on the desk
-          automatically. Other coins: same 10,000 on a Kadena / Kaspa / Nexa
-          wallet, or a desk grant. Join Discord. Buyer sends BCH. Volunteers
+          automatically. WART, HNS, XMR and the rest: same Discord talk, then
+          a desk grant — the key stays for those. Buyer sends BCH. Volunteers
           welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
