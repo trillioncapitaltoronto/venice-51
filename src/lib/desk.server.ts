@@ -1,4 +1,6 @@
-import { getSql, type Sql } from "@/lib/db";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { env } from "@/lib/env.server";
 
 function deskKey() {
@@ -21,58 +23,56 @@ function envPosters() {
     .filter(Boolean);
 }
 
-let postersReady = false;
+type FilePoster = { discord: string; grantedAt: string };
 
-export async function ensurePosters(sql: Sql) {
-  if (postersReady) return;
-  await sql.query(`
-    create table if not exists posters (
-      discord text primary key,
-      granted_at timestamptz not null default now()
-    )
-  `);
-  postersReady = true;
+function postersPath() {
+  const dir = process.env.PGLITE_DATA_DIR?.trim() || tmpdir();
+  mkdirSync(dir, { recursive: true });
+  return join(dir, "venice-posters.json");
 }
 
-export async function isGranted(sql: Sql, discord: string) {
+function readFilePosters(): FilePoster[] {
+  try {
+    const raw = readFileSync(postersPath(), "utf8");
+    const parsed = JSON.parse(raw) as FilePoster[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeFilePosters(rows: FilePoster[]) {
+  writeFileSync(postersPath(), JSON.stringify(rows), "utf8");
+}
+
+export async function isGranted(_sql: unknown, discord: string) {
   if (!deskKey()) return true;
   const name = discord.replace(/^@/, "").toLowerCase();
   if (envPosters().includes(name)) return true;
-  await ensurePosters(sql);
-  const rows = await sql<{ n: number }>`
-    select count(*)::int as n from posters where lower(discord) = ${name}
-  `;
-  return (rows[0]?.n ?? 0) > 0;
+  return readFilePosters().some((p) => p.discord.toLowerCase() === name);
 }
 
 export async function listImpl() {
-  const sql = await getSql();
-  await ensurePosters(sql);
-  const rows = await sql<{ discord: string; granted_at: string }>`
-    select discord, granted_at::text as granted_at from posters order by granted_at desc
-  `;
+  const rows = readFilePosters();
   const extra = envPosters().filter((n) => !rows.some((r) => r.discord.toLowerCase() === n));
   return [
-    ...rows.map((r) => ({ discord: r.discord, grantedAt: r.granted_at })),
+    ...rows.map((r) => ({ discord: r.discord, grantedAt: r.grantedAt })),
     ...extra.map((discord) => ({ discord, grantedAt: "env" })),
   ];
 }
 
 export async function grantImpl(deskKeyValue: string, discord: string) {
   if (!keyOk(deskKeyValue)) throw new Error("Desk key is wrong.");
-  const sql = await getSql();
-  await ensurePosters(sql);
-  await sql`
-    insert into posters (discord) values (${discord})
-    on conflict (discord) do nothing
-  `;
+  const rows = readFilePosters();
+  if (!rows.some((p) => p.discord.toLowerCase() === discord.toLowerCase())) {
+    rows.unshift({ discord, grantedAt: new Date().toISOString() });
+    writeFilePosters(rows);
+  }
   return { ok: true as const, discord };
 }
 
 export async function revokeImpl(deskKeyValue: string, discord: string) {
   if (!keyOk(deskKeyValue)) throw new Error("Desk key is wrong.");
-  const sql = await getSql();
-  await ensurePosters(sql);
-  await sql`delete from posters where lower(discord) = lower(${discord})`;
+  writeFilePosters(readFilePosters().filter((p) => p.discord.toLowerCase() !== discord.toLowerCase()));
   return { ok: true as const };
 }
