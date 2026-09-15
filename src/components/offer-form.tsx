@@ -83,7 +83,7 @@ export function OfferForm({ onDone }: { onDone?: () => void }) {
           <Input id="price" name="price" required placeholder="0.00008" inputMode="decimal" />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="discord">{`${DISCORD_NAME} username`}</Label>
+          <Label htmlFor="discord">{`${DISCORD_NAME} username (desk must have granted this name)`}</Label>
           <Input id="discord" name="discord" required placeholder="username" />
         </div>
         <div className="sm:col-span-2">
