@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { Shell } from "@/components/shell";
+import { TctcChainPicker } from "@/components/tctc-fields";
 import { Button } from "@/components/ui/button";
+import { Input, Label } from "@/components/ui/field";
 import {
   CARBON_NAME,
   CARBON_SUPPLY_TOTAL,
@@ -8,7 +12,10 @@ import {
   DISCORD_INVITE,
   DISCORD_NAME,
   TCTC_CHAINS,
+  TCTC_GRANT,
+  type CarbonChain,
 } from "@/lib/carbon-config";
+import { checkDeskPass } from "@/lib/pass";
 
 export const Route = createFileRoute("/pass")({ component: PassPage });
 
@@ -18,24 +25,28 @@ function PassPage() {
       <main className="mx-auto max-w-2xl px-4 py-12">
         <p className="font-mono text-xs tracking-[0.22em] text-muted">{CARBON_TICKER}</p>
         <h1 className="mt-3 text-3xl font-medium tracking-tight">
-          The token is the grant. It is free.
+          The token is the grant. {TCTC_GRANT.toLocaleString()} TCTC. Free.
         </h1>
         <p className="mt-3 text-sm text-muted">
-          {CARBON_TICKER} — {CARBON_NAME} — is the club pass. Venice does not
-          keep a name list. If the wallet holds ≥ 1 TCTC, you can post and take
-          tickets. Join {DISCORD_NAME}, we confirm you are real, then we send 1
-          from the parent wallet. No purchase. No Google. No X.
+          {CARBON_TICKER} — {CARBON_NAME} — is the club pass. Pick Kadena,
+          Kaspa, or Nexa. Join {DISCORD_NAME}, we confirm you are real, then we
+          send {TCTC_GRANT.toLocaleString()} TCTC from that chain’s parent
+          wallet. Holding ≥ {TCTC_GRANT.toLocaleString()} on the chain you
+          picked lets you post. No purchase. No Google. No X.
         </p>
         <p className="mt-3 text-sm text-muted">
-          {CARBON_SUPPLY_TOTAL.toLocaleString()} across three chains. Kadena,
-          Kaspa, and Nexa are live.
+          {CARBON_SUPPLY_TOTAL.toLocaleString()} across three chains. All three
+          are live.
         </p>
         <ol className="mt-8 list-decimal space-y-3 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME}.</li>
           <li>Talk to the desk. Real person, you’re in.</li>
-          <li>Give a Kadena, Kaspa, or Nexa address. We send 1 TCTC from the parent wallet.</li>
-          <li>That wallet is the pass. Post a ticket with it.</li>
+          <li>
+            Pick a chain. Give that wallet. We send {TCTC_GRANT.toLocaleString()} TCTC.
+          </li>
+          <li>Check the pass below. Then post a ticket with the same wallet.</li>
         </ol>
+        <VerifyBox />
         <div className="mt-10 space-y-4">
           {TCTC_CHAINS.map((c) => (
             <section key={c.id} className="rounded-xl border border-border bg-card p-5">
@@ -47,23 +58,25 @@ function PassPage() {
               </h2>
               <dl className="mt-3 space-y-2 font-mono text-xs text-muted">
                 <div>
+                  <dt className="uppercase tracking-wider">Grant</dt>
+                  <dd className="text-foreground">{TCTC_GRANT.toLocaleString()} TCTC per person</dd>
+                </div>
+                <div>
                   <dt className="uppercase tracking-wider">Supply</dt>
                   <dd className="text-foreground">{c.supply.toLocaleString()}</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider">Token id</dt>
-                  <dd className="break-all text-foreground">
-                    {c.tokenId || "Paste the token id and we wire it."}
-                  </dd>
+                  <dd className="break-all text-foreground">{c.tokenId}</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider">Parent wallet</dt>
                   <dd className="break-all text-foreground">
-                    {c.parentWallet || "Send the parent wallet"}
+                    {c.parentWallet || "Kadena parent k: still needed"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="uppercase tracking-wider">DEX</dt>
+                  <dt className="uppercase tracking-wider">{c.dexName || "Explorer"}</dt>
                   <dd>
                     {c.dexUrl ? (
                       <a
@@ -72,10 +85,10 @@ function PassPage() {
                         rel="noreferrer"
                         className="text-flare underline"
                       >
-                        {c.dexName}
+                        {c.dexUrl.replace(/^https:\/\//, "")}
                       </a>
                     ) : (
-                      "Not listed yet"
+                      "—"
                     )}
                   </dd>
                 </div>
@@ -99,5 +112,61 @@ function PassPage() {
         </div>
       </main>
     </Shell>
+  );
+}
+
+function VerifyBox() {
+  const [chain, setChain] = useState<CarbonChain>("kda");
+  const spec = TCTC_CHAINS.find((c) => c.id === chain);
+  const check = useMutation({
+    mutationFn: checkDeskPass,
+  });
+  return (
+    <section className="mt-10 rounded-xl border border-border bg-card p-5">
+      <h2 className="text-lg font-medium">Check a pass</h2>
+      <p className="mt-1 text-sm text-muted">
+        Choose the chain you verified on. We read the explorer. ≥{" "}
+        {TCTC_GRANT.toLocaleString()} TCTC is the pass.
+      </p>
+      <form
+        className="mt-4 grid gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const fd = new FormData(e.currentTarget);
+          check.mutate({
+            data: {
+              chain,
+              address: String(fd.get("address")).trim(),
+            },
+          });
+        }}
+      >
+        <TctcChainPicker value={chain} onChange={setChain} name="chain" />
+        <div>
+          <Label htmlFor="verifyAddress">{`${spec?.name ?? "TCTC"} wallet`}</Label>
+          <Input
+            id="verifyAddress"
+            name="address"
+            required
+            placeholder={chain === "kda" ? "k:…" : chain === "kas" ? "kaspa:…" : "nexa:…"}
+          />
+        </div>
+        {check.isError ? (
+          <p className="text-sm text-sell">
+            {check.error instanceof Error ? check.error.message : "Could not check"}
+          </p>
+        ) : null}
+        {check.data ? (
+          <p className={check.data.held ? "text-sm text-buy" : "text-sm text-sell"}>
+            {check.data.held
+              ? `Pass held — ${check.data.balance} TCTC on ${spec?.name}.`
+              : check.data.error}
+          </p>
+        ) : null}
+        <Button type="submit" disabled={check.isPending}>
+          {check.isPending ? "Checking…" : "Check this wallet"}
+        </Button>
+      </form>
+    </section>
   );
 }

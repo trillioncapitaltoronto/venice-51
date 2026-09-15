@@ -2,6 +2,8 @@ export const CARBON_TICKER = "TCTC";
 export const CARBON_NAME = "Trillion Carbon";
 export const CARBON_SUPPLY_TOTAL = 3_000_000;
 export const CARBON_SUPPLY_PER_CHAIN = 1_000_000;
+/** Desk grant: 10,000 TCTC sent once after Discord verify. That size is the pass. */
+export const TCTC_GRANT = 10_000;
 export const DISCORD_INVITE = "https://discord.gg/MTKwbkCmF";
 export const DISCORD_NAME = "Trillion Discord";
 

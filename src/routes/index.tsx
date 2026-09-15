@@ -4,7 +4,7 @@ import { Board } from "@/components/board";
 import { OfferForm } from "@/components/offer-form";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS } from "@/lib/carbon-config";
+import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS, TCTC_GRANT } from "@/lib/carbon-config";
 import { COINS } from "@/lib/coins";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -31,10 +31,11 @@ function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          TCTC (Trillion Carbon) is the grant — hold ≥ 1 and you can post. It
-          is free. Join Discord. We talk to you, make sure you are real, then
-          we send 1 TCTC. Buyer sends BCH. Volunteers who want to help build
-          this are welcome.
+          TCTC (Trillion Carbon) is the grant — {TCTC_GRANT.toLocaleString()}{" "}
+          TCTC per person, free. Pick Kadena, Kaspa, or Nexa. Join Discord. We
+          talk to you, make sure you are real, then we send the grant to that
+          chain. Hold ≥ {TCTC_GRANT.toLocaleString()} and you can post. Buyer
+          sends BCH. Volunteers who want to help build this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>
@@ -76,7 +77,7 @@ function Home() {
           {TCTC_CHAINS.map((c) => (
             <div key={c.id} className="rounded-xl border border-border bg-card px-4 py-3">
               <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
-                TCTC · {c.name}
+                TCTC · {c.name} · {TCTC_GRANT.toLocaleString()} grant
               </p>
               <p className="mt-1 font-mono text-xs break-all">
                 {c.tokenId || "token id coming"}

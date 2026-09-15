@@ -42,11 +42,12 @@ function Guide() {
             </p>
           </section>
           <section>
-            <h2 className="mb-2 text-foreground">TCTC is the grant — and free</h2>
+            <h2 className="mb-2 text-foreground">TCTC is the grant — 10,000, free</h2>
             <p>
-              Trillion Carbon is the club pass. Venice checks the chain. Hold ≥ 1
-              TCTC and you can post. We give it to you after we talk in{" "}
-              {DISCORD_NAME}. No purchase. Kadena is live:{" "}
+              Trillion Carbon is the club pass. Pick Kadena, Kaspa, or Nexa.
+              Venice checks that chain. Hold ≥ 10,000 TCTC and you can post. We
+              give you 10,000 after we talk in {DISCORD_NAME}. No purchase.
+              Kadena is{" "}
               <span className="break-all font-mono text-xs text-foreground">
                 n_d8d407d0445ed92ba102c2ce678591d69e464006.TRILLIONCARBON
               </span>

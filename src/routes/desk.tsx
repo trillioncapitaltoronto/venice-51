@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
+import { DISCORD_INVITE, DISCORD_NAME, TCTC_GRANT } from "@/lib/carbon-config";
 import { grantPoster, listPosters, revokePoster } from "@/lib/desk";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,18 @@ function DeskKey() {
         <h1 className="mt-3 text-3xl font-medium tracking-tight">Join the room. We verify you there.</h1>
         <p className="mt-3 text-sm text-muted">
           Click the invite. Walk in. We talk to you, make sure you are a real
-          person. Then we send 1 TCTC from the parent wallet to your Kadena,
-          Kaspa, or Nexa address. That token is the grant. Holding ≥ 1 TCTC
+          person. Pick Kadena, Kaspa, or Nexa. Then we send{" "}
+          {TCTC_GRANT.toLocaleString()} TCTC from that chain’s parent wallet.
+          Holding ≥ {TCTC_GRANT.toLocaleString()} TCTC on the chain you picked
           lets you post and take tickets.
         </p>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this page.</li>
           <li>Talk to the desk. We confirm you are real.</li>
-          <li>Give a Kadena, Kaspa, or Nexa address. You get 1 TCTC for free.</li>
+          <li>
+            Pick Kadena, Kaspa, or Nexa. Give that address. You get{" "}
+            {TCTC_GRANT.toLocaleString()} TCTC for free.
+          </li>
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">

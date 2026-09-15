@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
-import { CARBON_DEFAULTS, type CarbonChain } from "@/lib/carbon-config";
+import { CARBON_DEFAULTS, TCTC_GRANT, type CarbonChain } from "@/lib/carbon-config";
 
 export type CarbonPass = {
   chain: CarbonChain;
@@ -12,6 +12,22 @@ export type CarbonPass = {
   holder: boolean;
   checkedAt: string;
 };
+
+export const checkDeskPass = createServerFn({ method: "POST" })
+  .validator((input: { chain: string; address: string }) => {
+    const chain = input.chain;
+    if (chain !== "kas" && chain !== "kda" && chain !== "nexa") {
+      throw new Error("Pick Kadena, Kaspa, or Nexa.");
+    }
+    const address = input.address.trim();
+    if (address.length < 8 || address.length > 160) throw new Error("Address looks wrong.");
+    return { chain: chain as CarbonChain, address };
+  })
+  .handler(async ({ data }) => {
+    const { inspectTctcPass } = await import("@/lib/carbon");
+    const result = await inspectTctcPass(data.chain, data.address);
+    return { ...result, grant: TCTC_GRANT };
+  });
 
 export const getMyPass = createServerFn({ method: "GET" })
   .middleware([authMiddleware])

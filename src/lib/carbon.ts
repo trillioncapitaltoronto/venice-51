@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { CARBON_DEFAULTS, tctcChain, type CarbonChain } from "@/lib/carbon-config";
+import { CARBON_DEFAULTS, TCTC_GRANT, tctcChain, type CarbonChain } from "@/lib/carbon-config";
 
 export type { CarbonChain };
 export { CARBON_DEFAULTS } from "@/lib/carbon-config";
@@ -155,22 +155,46 @@ export async function verifyCarbonHold(
   return checkNexa(address, ref);
 }
 
-/** Token is the grant. Hold ≥ 1 TCTC on a wired chain or you cannot post. */
-export async function requireTctcPass(chain: CarbonChain, address: string): Promise<CarbonCheck> {
+/** Token is the grant. Hold ≥ 10,000 TCTC on the chain they picked. */
+export async function inspectTctcPass(chain: CarbonChain, address: string) {
   const spec = tctcChain(chain);
   if (!spec?.ready || !spec.tokenId) {
-    throw new Error(
-      `${spec?.name ?? chain} TCTC is not wired yet. Use Kadena, or wait for that chain’s token id.`,
-    );
+    return {
+      ok: false,
+      held: false,
+      balance: "0",
+      need: TCTC_GRANT,
+      chain,
+      error: `${spec?.name ?? chain} TCTC is not wired yet.`,
+    };
   }
   const addr = address.trim();
-  if (addr.length < 8) throw new Error("TCTC wallet looks wrong.");
+  if (addr.length < 8) {
+    return { ok: false, held: false, balance: "0", need: TCTC_GRANT, chain, error: "TCTC wallet looks wrong." };
+  }
   const check = await verifyCarbonHold(chain, addr, spec.tokenId);
-  if (!check.ok || Number(check.balance) < 1) {
+  const n = Number(check.balance);
+  const held = Boolean(check.ok && Number.isFinite(n) && n + 1e-12 >= TCTC_GRANT);
+  return {
+    ok: check.ok,
+    held,
+    balance: check.balance,
+    need: TCTC_GRANT,
+    chain,
+    error: held
+      ? undefined
+      : check.error ||
+        `Need ≥ ${TCTC_GRANT.toLocaleString()} TCTC on ${spec.name}. Join Discord, get the grant, then check again.`,
+  };
+}
+
+export async function requireTctcPass(chain: CarbonChain, address: string): Promise<CarbonCheck> {
+  const result = await inspectTctcPass(chain, address);
+  if (!result.held) {
     throw new Error(
-      check.error ||
-        "This wallet does not hold TCTC. Join Discord, get 1 sent from the parent wallet, then post.",
+      result.error ||
+        `This wallet does not hold ${TCTC_GRANT.toLocaleString()} TCTC. Join Discord, get the grant, then post.`,
     );
   }
-  return check;
+  return { ok: true, balance: result.balance };
 }
