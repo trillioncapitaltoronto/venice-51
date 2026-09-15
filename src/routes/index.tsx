@@ -28,8 +28,9 @@ function Home() {
         </h1>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          Agree in Discord. Buyer sends BCH. Referral happens in the room, not
-          on this site.
+          Join Discord. We talk to you and make sure you are real. Then you
+          trade in the room. Buyer sends BCH. Volunteers who want to help
+          build this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>
@@ -46,6 +47,10 @@ function Home() {
             </Button>
           </Link>
         </div>
+        <p className="mt-6 max-w-2xl text-sm text-muted">
+          Want to help make Venice 51 better? Volunteers are welcome — code,
+          explorers, honesty in the room. Join Discord and say so.
+        </p>
         <div className="mt-8 overflow-hidden border-y border-border py-3">
           <div className="flex gap-6 font-mono text-xs text-muted">
             {COINS.map((c) => (
