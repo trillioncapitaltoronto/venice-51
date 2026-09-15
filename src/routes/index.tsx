@@ -23,8 +23,8 @@ function Home() {
       </section>
       <main className="relative z-10 mx-auto max-w-6xl px-4 py-10">
         <p className="font-mono text-xs tracking-[0.22em] text-flare">SECTOR 51 · LAGUNA</p>
-        <h1 className="mt-3 max-w-3xl text-4xl font-medium tracking-tight sm:text-5xl">
-          A public floor for leftover PoW.
+        <h1 className="mt-3 max-w-4xl text-3xl font-medium tracking-tight sm:text-5xl">
+          The digital commodity midstream pipeline for upstream miners to sell to downstream consumers.
         </h1>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
