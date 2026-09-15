@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
@@ -30,6 +30,22 @@ function hasGlobbedMigrations(root: string): boolean {
  * migrations — no schema to apply — skips it entirely rather than paying for a
  * PGLite instance it never queries.
  */
+function copyPgliteSidecars(): Plugin {
+  return {
+    name: "copy-pglite-sidecars",
+    apply: "build",
+    closeBundle() {
+      const srcDir = join(process.cwd(), "node_modules/@electric-sql/pglite/dist");
+      const destDir = join(process.cwd(), ".output/server/_libs");
+      mkdirSync(destDir, { recursive: true });
+      for (const name of ["pglite.data", "pglite.wasm", "initdb.wasm"]) {
+        const from = join(srcDir, name);
+        if (existsSync(from)) copyFileSync(from, join(destDir, name));
+      }
+    },
+  };
+}
+
 function pgliteBootstrapPlugin(): Plugin {
   return {
     name: "app-builder:pglite-bootstrap",
@@ -187,5 +203,6 @@ export default defineConfig(({ command, isPreview }) => ({
         ]
       : []),
     viteReact(),
+    copyPgliteSidecars(),
   ],
 }));
