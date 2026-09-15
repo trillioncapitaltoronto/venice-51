@@ -8,6 +8,7 @@ import { explorerFor } from "@/lib/explorers";
 import { openEscrow, escrowForListing } from "@/lib/escrow";
 import { getListing, type PublicListing } from "@/lib/listings";
 import { markFilled } from "@/lib/trust";
+import { listTakes, postTake } from "@/lib/takes";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
@@ -87,6 +88,7 @@ function ListingPage() {
           <p className="mt-4 text-sm text-muted">{row.notes || "No note."}</p>
         </div>
         <WalletTrack row={row} onRefresh={() => qc.invalidateQueries({ queryKey: ["listing", listingId] })} />
+        <TakeBox row={row} />
         <section className="mt-6 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-medium">Do it in public</h2>
           <p className="mt-1 text-sm text-muted">
@@ -111,6 +113,79 @@ function ListingPage() {
         <TrustBox listingId={listingId} open={row.status === "open"} onChange={() => qc.invalidateQueries()} />
       </main>
     </Shell>
+  );
+}
+
+function TakeBox({ row }: { row: PublicListing }) {
+  const qc = useQueryClient();
+  const takes = useQuery({
+    queryKey: ["takes", row.id],
+    queryFn: () => listTakes({ data: { listingId: row.id } }),
+  });
+  const take = useMutation({
+    mutationFn: postTake,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["takes", row.id] }),
+  });
+  if (row.status !== "open") return null;
+  const verb = row.side === "sell" ? "Buy this offer" : "Sell into this bid";
+  return (
+    <section className="mt-6 rounded-xl border border-border bg-card p-5">
+      <h2 className="text-lg font-medium">{verb}</h2>
+      <p className="mt-1 text-sm text-muted">
+        You are the other side of this ticket. Desk must have granted your
+        Discord name. Then you talk in the room or lock BCH in a 2-of-2.
+      </p>
+      <form
+        className="mt-4 grid gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const fd = new FormData(e.currentTarget);
+          take.mutate({
+            data: {
+              listingId: row.id,
+              discord: String(fd.get("discord")),
+              wallet: String(fd.get("wallet")),
+              notes: String(fd.get("notes") ?? ""),
+            },
+          });
+        }}
+      >
+        <div>
+          <Label htmlFor="takeDiscord">{`${DISCORD_NAME} username`}</Label>
+          <Input id="takeDiscord" name="discord" required placeholder="username" />
+        </div>
+        <div>
+          <Label htmlFor="takeWallet">Your public wallet</Label>
+          <Input id="takeWallet" name="wallet" required placeholder="public address" />
+        </div>
+        <div>
+          <Label htmlFor="takeNotes">Note</Label>
+          <Input id="takeNotes" name="notes" placeholder="size you want, chain, whatever" />
+        </div>
+        {take.isError ? (
+          <p className="text-sm text-sell">
+            {take.error instanceof Error ? take.error.message : "Could not post"}
+          </p>
+        ) : null}
+        {take.isSuccess ? <p className="text-sm text-buy">You’re on this ticket.</p> : null}
+        <Button type="submit" disabled={take.isPending}>
+          {take.isPending ? "Posting…" : verb}
+        </Button>
+      </form>
+      <ul className="mt-5 space-y-2">
+        {(takes.data ?? []).length === 0 ? (
+          <li className="text-sm text-muted">Nobody has taken this yet.</li>
+        ) : (
+          (takes.data ?? []).map((t) => (
+            <li key={t.id} className="rounded-md border border-border px-3 py-2 text-sm">
+              <span className="font-mono">@{t.discord}</span>
+              <span className="ml-2 break-all font-mono text-xs text-muted">{t.wallet}</span>
+              {t.notes ? <p className="mt-1 text-muted">{t.notes}</p> : null}
+            </li>
+          ))
+        )}
+      </ul>
+    </section>
   );
 }
 

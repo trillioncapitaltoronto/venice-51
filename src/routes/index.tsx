@@ -10,7 +10,7 @@ import { COINS } from "@/lib/coins";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  const [posting, setPosting] = useState(false);
+  const [posting, setPosting] = useState<false | "buy" | "sell">(false);
   return (
     <Shell>
       <section className="relative isolate overflow-hidden">
@@ -37,8 +37,18 @@ function Home() {
           this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button type="button" onClick={() => setPosting((v) => !v)}>
-            {posting ? "Close ticket form" : "Post a ticket"}
+          <Button
+            type="button"
+            onClick={() => setPosting((v) => (v === "sell" ? false : "sell"))}
+          >
+            {posting === "sell" ? "Close" : "Post an offer (sell)"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setPosting((v) => (v === "buy" ? false : "buy"))}
+          >
+            {posting === "buy" ? "Close" : "Post a bid (buy)"}
           </Button>
           <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
             <Button type="button" variant="outline">
@@ -74,11 +84,18 @@ function Home() {
         </div>
         {posting ? (
           <section className="mt-8 rounded-xl border border-border bg-card p-5">
-            <h2 className="text-lg font-medium">New ticket</h2>
+            <h2 className="text-lg font-medium">
+              {posting === "sell" ? "New offer — you are selling" : "New bid — you are buying"}
+            </h2>
             <p className="mb-4 text-sm text-muted">
-              Coin, size, BCH ask, Discord, wallet to watch.
+              Desk must have granted your Discord name. Coin, size, BCH price,
+              wallet we watch.
             </p>
-            <OfferForm onDone={() => setPosting(false)} />
+            <OfferForm
+              key={posting}
+              initialSide={posting}
+              onDone={() => setPosting(false)}
+            />
           </section>
         ) : null}
         <section className="mt-10">

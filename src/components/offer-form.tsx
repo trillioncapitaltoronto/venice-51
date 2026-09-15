@@ -7,11 +7,17 @@ import { postOffer } from "@/lib/listings";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/field";
 
-export function OfferForm({ onDone }: { onDone?: () => void }) {
+export function OfferForm({
+  onDone,
+  initialSide = "sell",
+}: {
+  onDone?: () => void;
+  initialSide?: "buy" | "sell";
+}) {
   const nav = useNavigate();
   const qc = useQueryClient();
   const [error, setError] = useState<string | null>(null);
-  const [side, setSide] = useState<"buy" | "sell">("sell");
+  const [side, setSide] = useState<"buy" | "sell">(initialSide);
   const mut = useMutation({
     mutationFn: postOffer,
     onSuccess: async (res) => {
