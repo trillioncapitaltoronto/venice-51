@@ -28,9 +28,10 @@ function Home() {
         </h1>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          Join Discord. We talk to you and make sure you are real. Then you
-          trade in the room. Buyer sends BCH. Volunteers who want to help
-          build this are welcome.
+          TCTC (Trillion Carbon) is required to be on the floor — and it is
+          free. Join Discord. We talk to you, make sure you are real, then
+          you get TCTC. Buyer sends BCH. Volunteers who want to help build
+          this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>

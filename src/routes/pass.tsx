@@ -16,18 +16,19 @@ function PassPage() {
     <Shell>
       <main className="mx-auto max-w-xl px-4 py-12">
         <p className="font-mono text-xs tracking-[0.22em] text-muted">{CARBON_TICKER}</p>
-        <h1 className="mt-3 text-3xl font-medium tracking-tight">Registration is TCTC.</h1>
+        <h1 className="mt-3 text-3xl font-medium tracking-tight">TCTC is required. It is free.</h1>
         <p className="mt-3 text-sm text-muted">
-          {CARBON_TICKER} is Trillion Capital Trillion Carbon — the membership
-          token for Venice 51. {CARBON_SUPPLY_TOTAL.toLocaleString()} total,{" "}
+          {CARBON_TICKER} — Trillion Capital Trillion Carbon — is the club
+          pass. You need it to be on Venice 51. We give it to you. No purchase.
+          Join {DISCORD_NAME}, we confirm you are real, then you get TCTC.
+          {CARBON_SUPPLY_TOTAL.toLocaleString()} total,{" "}
           {CARBON_SUPPLY_PER_CHAIN.toLocaleString()} each on Kadena, Kaspa, and
-          Nexa. Hold it on any of those chains. That is how you register. No
-          Google. No X. The chatroom is {DISCORD_NAME}.
+          Nexa. No Google. No X.
         </p>
         <ol className="mt-8 list-decimal space-y-3 pl-5 text-sm text-muted">
-          <li>Someone in the club refers you. That name goes on the ticket.</li>
-          <li>Hold TCTC on Kadena, Kaspa, or Nexa.</li>
-          <li>Post. Talk in {DISCORD_NAME}. Dust. Settle. No escrow.</li>
+          <li>Join {DISCORD_NAME} with the invite on this site.</li>
+          <li>Talk to the desk. We verify you are a real person.</li>
+          <li>You get TCTC for free. Then you can post and trade.</li>
         </ol>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">

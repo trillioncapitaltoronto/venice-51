@@ -33,11 +33,13 @@ function Guide() {
             </p>
           </section>
           <section>
-            <h2 className="mb-2 text-foreground">TCTC is registration</h2>
+            <h2 className="mb-2 text-foreground">TCTC is required — and free</h2>
             <p>
-              Trillion Capital Trillion Carbon. Three million tokens — one
-              million each on Kadena, Kaspa, and Nexa. Hold it, you are on the
-              exchange. No Google. No X. The desk checks the chain when you post.
+              Trillion Capital Trillion Carbon is the club pass. You need TCTC
+              to be on Venice 51. We give it to you after we talk in{" "}
+              {DISCORD_NAME} and confirm you are real. No purchase. Three
+              million tokens — one million each on Kadena, Kaspa, and Nexa. No
+              Google. No X.
             </p>
           </section>
           <section>

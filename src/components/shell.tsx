@@ -48,8 +48,7 @@ export function Shell({ children }: { children: ReactNode }) {
           />
           <p className="text-center text-xs text-muted">
             Venice 51 is a Trillion Capital venue — Coin / BCH books, Discord
-            floor. Join the room, get verified there. Volunteers welcome. No
-            escrow.
+            floor. TCTC is required and free. Volunteers welcome. No escrow.
           </p>
         </div>
       </footer>

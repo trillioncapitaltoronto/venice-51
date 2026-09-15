@@ -19,6 +19,7 @@ function DeskKey() {
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this page.</li>
           <li>Talk to the desk. We confirm you are real.</li>
+          <li>You get TCTC for free. That token is required — we do not sell it.</li>
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
