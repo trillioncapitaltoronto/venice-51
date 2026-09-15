@@ -7,8 +7,8 @@ import { discordOpener, ticketCode } from "@/lib/handshake";
 import { explorerFor } from "@/lib/explorers";
 import { openEscrow, escrowForListing } from "@/lib/escrow";
 import { getListing, type PublicListing } from "@/lib/listings";
-import { markFilled } from "@/lib/trust";
 import { listTakes, postTake } from "@/lib/takes";
+import { getPrint, stampPrint } from "@/lib/prints";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
@@ -116,7 +116,7 @@ function ListingPage() {
             <LockBch listingId={listingId} />
           </div>
         </section>
-        <TrustBox listingId={listingId} open={row.status === "open"} onChange={() => qc.invalidateQueries()} />
+        <TrustBox listingId={listingId} row={row} onChange={() => qc.invalidateQueries()} />
       </main>
     </Shell>
   );
@@ -290,44 +290,79 @@ function CopyLine({ text }: { text: string }) {
 
 function TrustBox({
   listingId,
-  open,
+  row,
   onChange,
 }: {
   listingId: number;
-  open: boolean;
+  row: PublicListing;
   onChange: () => void;
 }) {
-  const fill = useMutation({
-    mutationFn: markFilled,
+  const print = useQuery({
+    queryKey: ["print", listingId],
+    queryFn: () => getPrint({ data: { listingId } }),
+  });
+  const stamp = useMutation({
+    mutationFn: stampPrint,
     onSuccess: onChange,
   });
-  if (!open) return null;
+  const p = print.data;
+  if (p?.status === "printed") {
+    return (
+      <section className="mt-6 rounded-xl border border-flare/40 bg-card p-5">
+        <h2 className="text-lg font-medium">On the tape</h2>
+        <p className="mt-2 font-mono text-sm">
+          {p.code} · {p.amount} {p.coin} @ {p.price} BCH
+        </p>
+        <p className="mt-1 font-mono text-sm">
+          @{p.poster} ↔ @{p.other}
+        </p>
+        <Link to="/tape" className="mt-3 inline-block text-sm text-flare underline">
+          Open the tape
+        </Link>
+      </section>
+    );
+  }
+  if (row.status !== "open") return null;
   return (
     <form
       className="mt-6 rounded-xl border border-border bg-card p-5"
       onSubmit={(e) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
-        fill.mutate({
-          data: { listingId, counterparty: String(fd.get("counterparty")) },
+        stamp.mutate({
+          data: {
+            listingId,
+            discord: String(fd.get("discord")),
+            counterparty: String(fd.get("counterparty")),
+          },
         });
       }}
     >
-      <h2 className="text-lg font-medium">Mark filled</h2>
+      <h2 className="text-lg font-medium">We printed</h2>
       <p className="mt-1 text-sm text-muted">
-        Both Discord names get a public fill. Venice does not pay anyone.
+        Both names stamp. First stamp waits. Second stamp puts it on the public
+        tape. Venice does not hold the coins.
       </p>
-      <div className="mt-3">
-        <Label htmlFor="counterparty">Other Discord name</Label>
-        <Input id="counterparty" name="counterparty" required placeholder="username" />
-      </div>
-      {fill.isError ? (
-        <p className="mt-2 text-sm text-sell">
-          {fill.error instanceof Error ? fill.error.message : "Could not fill"}
+      {p?.status === "pending" ? (
+        <p className="mt-2 text-sm text-flare">
+          Waiting on @{p.posterSaid ? p.other : p.poster} to stamp.
         </p>
       ) : null}
-      <Button type="submit" className="mt-3" disabled={fill.isPending}>
-        {fill.isPending ? "Saving…" : "Add a fill"}
+      <div className="mt-3">
+        <Label htmlFor="stampYou">Your Discord name</Label>
+        <Input id="stampYou" name="discord" required placeholder="username" />
+      </div>
+      <div className="mt-3">
+        <Label htmlFor="stampThem">Their Discord name</Label>
+        <Input id="stampThem" name="counterparty" required placeholder="the other person" />
+      </div>
+      {stamp.isError ? (
+        <p className="mt-2 text-sm text-sell">
+          {stamp.error instanceof Error ? stamp.error.message : "Could not stamp"}
+        </p>
+      ) : null}
+      <Button type="submit" className="mt-3" disabled={stamp.isPending}>
+        {stamp.isPending ? "Stamping…" : "Stamp this print"}
       </Button>
     </form>
   );

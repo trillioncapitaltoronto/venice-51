@@ -24,6 +24,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex items-center gap-1 text-sm">
             <NavLink to="/">Board</NavLink>
+            <NavLink to="/tape">Tape</NavLink>
             <NavLink to="/pass">TCTC</NavLink>
             <NavLink to="/desk">Club</NavLink>
             <NavLink to="/guide">Desk rules</NavLink>

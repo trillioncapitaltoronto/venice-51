@@ -15,6 +15,7 @@ import { Route as GuideRouteImport } from './routes/guide'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyRouteImport } from './routes/my'
 import { Route as PassRouteImport } from './routes/pass'
+import { Route as TapeRouteImport } from './routes/tape'
 import { Route as EscrowIdRouteImport } from './routes/escrow.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -49,6 +50,11 @@ const PassRoute = PassRouteImport.update({
   path: '/pass',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TapeRoute = TapeRouteImport.update({
+  id: '/tape',
+  path: '/tape',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EscrowIdRoute = EscrowIdRouteImport.update({
   id: '/escrow/$id',
   path: '/escrow/$id',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/my': typeof MyRoute
   '/pass': typeof PassRoute
+  '/tape': typeof TapeRoute
   '/escrow/$id': typeof EscrowIdRoute
   '/listing/$id': typeof ListingIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/my': typeof MyRoute
   '/pass': typeof PassRoute
+  '/tape': typeof TapeRoute
   '/escrow/$id': typeof EscrowIdRoute
   '/listing/$id': typeof ListingIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/my': typeof MyRoute
   '/pass': typeof PassRoute
+  '/tape': typeof TapeRoute
   '/escrow/$id': typeof EscrowIdRoute
   '/listing/$id': typeof ListingIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my'
     | '/pass'
+    | '/tape'
     | '/escrow/$id'
     | '/listing/$id'
     | '/api/auth/$'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my'
     | '/pass'
+    | '/tape'
     | '/escrow/$id'
     | '/listing/$id'
     | '/api/auth/$'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/my'
     | '/pass'
+    | '/tape'
     | '/escrow/$id'
     | '/listing/$id'
     | '/api/auth/$'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MyRoute: typeof MyRoute
   PassRoute: typeof PassRoute
+  TapeRoute: typeof TapeRoute
   EscrowIdRoute: typeof EscrowIdRoute
   ListingIdRoute: typeof ListingIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tape': {
+      id: '/tape'
+      path: '/tape'
+      fullPath: '/tape'
+      preLoaderRoute: typeof TapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/escrow/$id': {
       id: '/escrow/$id'
       path: '/escrow/$id'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MyRoute: MyRoute,
   PassRoute: PassRoute,
+  TapeRoute: TapeRoute,
   EscrowIdRoute: EscrowIdRoute,
   ListingIdRoute: ListingIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

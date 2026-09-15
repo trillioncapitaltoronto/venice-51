@@ -4,6 +4,7 @@ import { Board } from "@/components/board";
 import { OfferForm } from "@/components/offer-form";
 import { Shell } from "@/components/shell";
 import { TwoDoors } from "@/components/two-doors";
+import { TapeStrip } from "@/components/tape-strip";
 import { Button } from "@/components/ui/button";
 import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS, TCTC_GRANT } from "@/lib/carbon-config";
 import { COINS } from "@/lib/coins";
@@ -36,6 +37,9 @@ function Home() {
         </p>
         <div className="mt-6 max-w-4xl">
           <TwoDoors />
+        </div>
+        <div className="mt-8">
+          <TapeStrip />
         </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>

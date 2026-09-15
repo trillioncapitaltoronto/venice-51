@@ -71,6 +71,15 @@ function Guide() {
             </p>
           </section>
           <section>
+            <h2 className="mb-2 text-foreground">The tape</h2>
+            <p>
+              After you settle in the room, both Discord names stamp the ticket.
+              First stamp waits. Second stamp writes size, BCH, names, and time
+              onto a public tape. No eraser. Venice never held the coins. That
+              record is the résumé — and the scar.
+            </p>
+          </section>
+          <section>
             <h2 className="mb-2 text-foreground">Discord is the floor</h2>
             <p>
               Click a ticket, copy V51-n, open {DISCORD_NAME}, ping the name on
