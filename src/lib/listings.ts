@@ -3,7 +3,6 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { QUOTES, TICKERS } from "@/lib/coins";
 import { fundedEnough, watchBalance } from "@/lib/proof";
-import { isGranted } from "@/lib/desk";
 
 const amountRe = /^\d+(\.\d{1,8})?$/;
 const handleRe = /^[A-Za-z0-9_@.\-+]{2,64}$/;
@@ -243,6 +242,7 @@ export const postOffer = createServerFn({ method: "POST" })
     const sql = await getSql();
     await ensureWalletCols(sql);
     const discord = data.discord.replace(/^@/, "");
+    const { isGranted } = await import("./desk.server");
     if (!(await isGranted(sql, discord))) {
       throw new Error("Desk has not granted this Discord name yet. Join the room first.");
     }
