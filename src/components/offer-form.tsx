@@ -87,7 +87,7 @@ export function OfferForm({ onDone }: { onDone?: () => void }) {
           <Input id="discord" name="discord" required placeholder="username" />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="wallet">Wallet to watch (the coins for sale)</Label>
+          <Label htmlFor="wallet">Public wallet we watch on the chain explorer</Label>
           <Input id="wallet" name="wallet" required placeholder="public address" />
         </div>
       </div>

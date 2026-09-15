@@ -26,6 +26,7 @@ export type PublicListing = {
   funded: boolean;
   wallet: string;
   walletBalance: string;
+  walletError?: string;
   vouched: boolean;
   fills: number;
 };
@@ -65,6 +66,7 @@ function mapRow(r: {
   wallet_address?: string;
   wallet_balance?: string;
   wallet_verified?: boolean;
+  wallet_error?: string;
   vouch_confirmed?: boolean;
   fills?: number;
 }): PublicListing {
@@ -84,6 +86,7 @@ function mapRow(r: {
     funded: Boolean(r.wallet_verified),
     wallet: r.wallet_address ?? "",
     walletBalance: r.wallet_balance ?? "",
+    walletError: r.wallet_error,
     vouched: Boolean(r.vouch_confirmed),
     fills: Number(r.fills ?? 0),
   };
@@ -218,6 +221,7 @@ export const getListing = createServerFn({ method: "GET" })
         `;
         row.wallet_balance = proof.balance;
         row.wallet_verified = verified;
+        (row as { wallet_error?: string }).wallet_error = proof.error;
       } catch {
         /* keep last check */
       }
@@ -233,7 +237,7 @@ const offerInput = z.object({
   price: z.string().regex(amountRe, "Price must be a decimal"),
   notes: z.string().max(280),
   discord: z.string().regex(handleRe, "Discord name looks wrong"),
-  wallet: z.string().min(8).max(128),
+  wallet: z.string().min(8).max(160),
 });
 
 export const postOffer = createServerFn({ method: "POST" })

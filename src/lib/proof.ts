@@ -95,9 +95,55 @@ async function kda(address: string): Promise<Proof> {
   return { ok: n > 0, balance: String(n) };
 }
 
+async function eti(address: string): Promise<Proof> {
+  const json = (await getJson(
+    `https://www.eticascan.org/apiv1/balance/address/${encodeURIComponent(address)}`,
+  )) as { querysuccess?: boolean; result?: { eticas?: string } };
+  if (!json.querysuccess) return { ok: false, balance: "0", error: "Eticascan had no balance." };
+  const wei = num(json.result?.eticas);
+  if (!Number.isFinite(wei)) return { ok: false, balance: "0", error: "Eticascan had no balance." };
+  const coins = wei / 1e18;
+  return { ok: coins > 0, balance: String(coins) };
+}
+
+async function hns(address: string): Promise<Proof> {
+  try {
+    const json = (await getJson(
+      `https://e.hnsfans.com/api/address/${encodeURIComponent(address)}`,
+    )) as { balance?: number | string; confirmed?: { balance?: number | string } };
+    const n = num(json.balance ?? json.confirmed?.balance);
+    if (Number.isFinite(n)) {
+      const coins = n > 1e6 ? n / 1e6 : n;
+      return { ok: coins > 0, balance: String(coins) };
+    }
+  } catch {
+    /* fall through */
+  }
+  const bare = address.trim();
+  const json = (await getJson(
+    `https://api.blockchair.com/handshake/dashboards/address/${encodeURIComponent(bare)}?limit=1`,
+  )) as { data?: Record<string, { address?: { balance?: number } }> };
+  const row = json.data?.[bare];
+  const raw = num(row?.address?.balance);
+  if (!Number.isFinite(raw)) return { ok: false, balance: "0", error: "HNS explorer had no balance." };
+  const coins = raw / 1e6;
+  return { ok: coins > 0, balance: String(coins) };
+}
+
+async function nexa(address: string): Promise<Proof> {
+  const addr = address.includes(":") ? address : `nexa:${address}`;
+  const json = (await getJson(
+    `https://tokenapi.otoplo.com/address/${encodeURIComponent(addr)}`,
+  )) as { balance?: number | string; confirmed?: number | string };
+  const sats = num(json.balance ?? json.confirmed);
+  if (!Number.isFinite(sats)) return { ok: false, balance: "0", error: "Nexa explorer had no balance." };
+  const coins = sats / 100;
+  return { ok: coins > 0, balance: String(coins) };
+}
+
 export async function watchBalance(coin: string, address: string): Promise<Proof> {
   const addr = address.trim();
-  if (addr.length < 8 || addr.length > 128 || /[\s<>'"]/.test(addr)) {
+  if (addr.length < 8 || addr.length > 160 || /[\s<>'"]/.test(addr)) {
     return { ok: false, balance: "0", error: "Address looks wrong." };
   }
   try {
@@ -112,11 +158,17 @@ export async function watchBalance(coin: string, address: string): Promise<Proof
         return await erg(addr);
       case "KDA":
         return await kda(addr);
+      case "ETI":
+        return await eti(addr);
+      case "HNS":
+        return await hns(addr);
+      case "NEXA":
+        return await nexa(addr);
       case "XMR":
         return {
           ok: false,
           balance: "0",
-          error: "Monero addresses are private. Can't watch-verify.",
+          error: "Monero is private. We link the explorer; we cannot watch a balance without a view key.",
         };
       default:
         return {
