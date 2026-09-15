@@ -1,13 +1,10 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { COINS, coinName } from "@/lib/coins";
-import { DISCORD_NAME } from "@/lib/carbon-config";
 import { ticketCode } from "@/lib/handshake";
-import { listListings, listingStats, postOffer, type PublicListing } from "@/lib/listings";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/field";
+import { listListings, listingStats, type PublicListing } from "@/lib/listings";
 import { cn } from "@/lib/utils";
 
 export function Board() {
@@ -103,8 +100,8 @@ function OrderBook({
         </p>
       </header>
       <div className="grid md:grid-cols-2">
-        <BookSide title="Bids" side="buy" ticker={ticker} rows={bids} empty="No bids" />
-        <BookSide title="Asks" side="sell" ticker={ticker} rows={asks} empty="No asks" />
+        <BookSide title="Bids" side="buy" rows={bids} empty="No bids" />
+        <BookSide title="Asks" side="sell" rows={asks} empty="No asks" />
       </div>
     </section>
   );
@@ -113,17 +110,14 @@ function OrderBook({
 function BookSide({
   title,
   side,
-  ticker,
   rows,
   empty,
 }: {
   title: string;
   side: "buy" | "sell";
-  ticker: string;
   rows: PublicListing[];
   empty: string;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <div className={cn("px-2 py-2", side === "sell" ? "md:border-l md:border-border" : "")}>
       <div
@@ -160,72 +154,7 @@ function BookSide({
           ))}
         </ul>
       )}
-      <div className="px-2 pt-2">
-        <button
-          type="button"
-          className="h-9 text-xs text-muted hover:text-foreground"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? "Close" : side === "buy" ? `+ Bid ${ticker}` : `+ Ask ${ticker}`}
-        </button>
-        {open ? <BookPost coin={ticker} side={side} onDone={() => setOpen(false)} /> : null}
-      </div>
     </div>
-  );
-}
-
-function BookPost({
-  coin,
-  side,
-  onDone,
-}: {
-  coin: string;
-  side: "buy" | "sell";
-  onDone: () => void;
-}) {
-  const nav = useNavigate();
-  const qc = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
-  const mut = useMutation({
-    mutationFn: postOffer,
-    onSuccess: async (res) => {
-      await qc.invalidateQueries();
-      onDone();
-      void nav({ to: "/listing/$id", params: { id: String(res.id) } });
-    },
-    onError: (e: Error) => setError(e.message || "Could not post"),
-  });
-  return (
-    <form
-      className="mt-2 grid gap-2 rounded-md border border-border p-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        setError(null);
-        const fd = new FormData(e.currentTarget);
-        mut.mutate({
-          data: {
-            side,
-            coin,
-            amount: String(fd.get("amount")).trim(),
-            quoteAsset: "BCH",
-            price: String(fd.get("price")).trim(),
-            notes: String(fd.get("notes") ?? ""),
-            discord: String(fd.get("discord")).trim(),
-            wallet: String(fd.get("wallet")).trim(),
-          },
-        });
-      }}
-    >
-      <Input name="amount" required placeholder="Size" inputMode="decimal" />
-      <Input name="price" required placeholder="Price in BCH" inputMode="decimal" />
-      <Input name="discord" required placeholder={`${DISCORD_NAME} username`} />
-      <Input name="wallet" required placeholder="Public wallet" />
-      <Input name="notes" placeholder="Note (optional)" />
-      {error ? <p className="text-xs text-sell">{error}</p> : null}
-      <Button type="submit" disabled={mut.isPending}>
-        {mut.isPending ? "Posting…" : side === "buy" ? "Post bid" : "Post ask"}
-      </Button>
-    </form>
   );
 }
 

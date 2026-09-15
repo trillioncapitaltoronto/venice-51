@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Board } from "@/components/board";
+import { OfferForm } from "@/components/offer-form";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
@@ -8,6 +10,7 @@ import { COINS } from "@/lib/coins";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
+  const [posting, setPosting] = useState(false);
   return (
     <Shell>
       <section className="relative isolate overflow-hidden">
@@ -34,8 +37,13 @@ function Home() {
           this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
+          <Button type="button" onClick={() => setPosting((v) => !v)}>
+            {posting ? "Hide ticket form" : "Post a ticket"}
+          </Button>
           <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
-            <Button type="button">Join {DISCORD_NAME}</Button>
+            <Button type="button" variant="outline">
+              Join {DISCORD_NAME}
+            </Button>
           </a>
           <Link to="/guide">
             <Button type="button" variant="outline">
@@ -64,6 +72,16 @@ function Home() {
             ))}
           </div>
         </div>
+        {posting ? (
+          <section className="mt-8 rounded-xl border border-border bg-card p-5">
+            <h2 className="text-lg font-medium">New ticket</h2>
+            <p className="mb-4 text-sm text-muted">
+              I am selling or I am buying. Coin, size, BCH price, Discord,
+              wallet we watch.
+            </p>
+            <OfferForm onDone={() => setPosting(false)} />
+          </section>
+        ) : null}
         <section className="mt-10">
           <Board />
         </section>
