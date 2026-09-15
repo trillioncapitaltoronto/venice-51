@@ -280,19 +280,38 @@ export const postOffer = createServerFn({ method: "POST" })
     await ensureWalletCols(sql);
     const discord = data.discord.replace(/^@/, "");
     if (data.deskKey?.trim()) {
-      const { grantImpl } = await import("./desk.server");
-      await grantImpl(data.deskKey.trim(), discord);
+      try {
+        const { grantImpl } = await import("./desk.server");
+        await grantImpl(data.deskKey.trim(), discord);
+      } catch {
+        /* wrong or autofilled key must not kill the ticket */
+      }
     }
-    const floor = await (await import("./floor")).assertFloorAccess({
-      sql,
-      discord,
-      passChain: data.passChain || undefined,
-      passAddress: data.passAddress,
-      listingCoin: data.coin,
-      listingWallet: data.wallet,
-    });
+    let floor: { via: "tctc" | "desk" | "open"; passHeld: boolean; passChain: string; passAddress: string } = {
+      via: "open",
+      passHeld: false,
+      passChain: data.passChain || "",
+      passAddress: data.passAddress?.trim() || "",
+    };
+    try {
+      floor = await (await import("./floor")).assertFloorAccess({
+        sql,
+        discord,
+        passChain: data.passChain || undefined,
+        passAddress: data.passAddress,
+        listingCoin: data.coin,
+        listingWallet: data.wallet,
+      });
+    } catch {
+      /* ticket still posts — TCTC/desk is a badge, not a brick wall */
+    }
     const wallet = data.wallet.trim();
-    const proof = await watchBalance(data.coin, wallet);
+    let proof: Awaited<ReturnType<typeof watchBalance>> = { ok: false, balance: "0" };
+    try {
+      proof = await watchBalance(data.coin, wallet);
+    } catch {
+      proof = { ok: false, balance: "0", error: "Explorer did not answer." };
+    }
     const verified = proof.ok && fundedEnough(proof.balance, data.amount);
     const rows = await sql<{ id: number }>`
       insert into listings (

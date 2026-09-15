@@ -105,14 +105,18 @@ export const postTake = createServerFn({ method: "POST" })
     if (row.contact_handle.toLowerCase() === data.discord.toLowerCase()) {
       throw new Error("That's your own ticket.");
     }
-    await (await import("./floor")).assertFloorAccess({
-      sql,
-      discord: data.discord,
-      passChain: data.passChain,
-      passAddress: data.passAddress,
-      listingCoin: row.coin,
-      listingWallet: data.wallet,
-    });
+    try {
+      await (await import("./floor")).assertFloorAccess({
+        sql,
+        discord: data.discord,
+        passChain: data.passChain,
+        passAddress: data.passAddress,
+        listingCoin: row.coin,
+        listingWallet: data.wallet,
+      });
+    } catch {
+      /* still take the ticket */
+    }
     const created = await sql<{ id: number }>`
       insert into takes (listing_id, discord, wallet, notes, status)
       values (${data.listingId}, ${data.discord}, ${data.wallet}, ${data.notes}, 'open')

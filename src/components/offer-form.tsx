@@ -51,7 +51,6 @@ export function OfferForm({
             wallet,
             passChain: autoChain ?? (String(fd.get("passChain") || "") as "kda" | "kas" | "nexa" | ""),
             passAddress: autoChain ? wallet : String(fd.get("passAddress") ?? "").trim(),
-            deskKey: String(fd.get("deskKey") ?? "").trim(),
           },
         });
       }}
@@ -98,7 +97,7 @@ export function OfferForm({
           <Input id="amount" name="amount" required placeholder="1000" inputMode="decimal" />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="price">Ask in BCH (per coin)</Label>
+          <Label htmlFor="price">{side === "buy" ? "Bid in BCH (per coin)" : "Ask in BCH (per coin)"}</Label>
           <Input id="price" name="price" required placeholder="0.00008" inputMode="decimal" />
         </div>
         <div className="sm:col-span-2">
@@ -122,21 +121,14 @@ export function OfferForm({
         </div>
         {autoChain ? (
           <p className="sm:col-span-2 text-sm text-muted">
-            Posting {coin}. ≥ {TCTC_GRANT.toLocaleString()} TCTC on this wallet
-            opens the desk. No TCTC? Paste the desk key below.
+            Posting {coin}. If this wallet holds ≥ {TCTC_GRANT.toLocaleString()} TCTC,
+            you get the pass badge.
           </p>
         ) : (
-          <div className="sm:col-span-2 grid gap-2">
-            <p className="text-sm text-muted">
-              {coin}: TCTC wallet optional. Or paste the desk key (door 2).
-            </p>
+          <div className="sm:col-span-2">
             <TctcFields />
           </div>
         )}
-        <div className="sm:col-span-2">
-          <Label htmlFor="deskKey">Desk key — door 2, if you have it</Label>
-          <Input id="deskKey" name="deskKey" type="password" autoComplete="off" placeholder="leave blank if you hold TCTC" />
-        </div>
       </div>
       <div>
         <Label htmlFor="notes">Notes</Label>
