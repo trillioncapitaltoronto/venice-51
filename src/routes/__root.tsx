@@ -15,7 +15,7 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "Venice 51 — BCH OTC desk swap line. Providing liquidity where it doesn't exist.",
+        content: "BCH OTC desk for leftover PoW. Public prints. No escrow. Providing liquidity where it doesn't exist.",
       },
       { name: "theme-color", content: "#0c0c0d" },
     ],

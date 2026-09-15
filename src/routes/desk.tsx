@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS, TCTC_GRANT } from "@/lib/carbon-config";
 import { grantPoster, listPosters, revokePoster } from "@/lib/desk";
 import { Shell } from "@/components/shell";
+import { PitchBox } from "@/components/pitch-box";
 import { TwoDoors } from "@/components/two-doors";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
@@ -70,6 +71,9 @@ function DeskPage() {
           </ul>
         </section>
         <GrantBox />
+        <div className="mt-8">
+          <PitchBox />
+        </div>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
           <img src="/plutus-lockup.png" alt="Plutus" className="h-16 w-auto" />
           <p className="mt-3 text-sm text-muted">
