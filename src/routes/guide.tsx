@@ -51,8 +51,11 @@ function Guide() {
                 n_d8d407d0445ed92ba102c2ce678591d69e464006.TRILLIONCARBON
               </span>
               , listed on Mercatus. Kaspa TCTC is live on kaspa.com (KRC-20
-              ticker TCTC). Nexa gets the same id on the pass page when it is
-              posted. No Google. No X.
+              ticker TCTC). Nexa TCTC is{" "}
+              <span className="break-all font-mono text-xs text-foreground">
+                nexa:tpc29y9ahl0m62av6qv4n44vhl9yx8fl2prcvdmfm2zkggg75qqqq3f2seyj9
+              </span>
+              . No Google. No X.
             </p>
           </section>
           <section>

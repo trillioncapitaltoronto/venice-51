@@ -18,15 +18,14 @@ function DeskKey() {
         <h1 className="mt-3 text-3xl font-medium tracking-tight">Join the room. We verify you there.</h1>
         <p className="mt-3 text-sm text-muted">
           Click the invite. Walk in. We talk to you, make sure you are a real
-          person. Then we send 1 TCTC from the parent wallet to your Kadena
-          k: or Kaspa address. That token is the grant. Holding ≥ 1 TCTC lets
-          you post and take tickets. Nexa follows when that id is on the pass
-          page.
+          person. Then we send 1 TCTC from the parent wallet to your Kadena,
+          Kaspa, or Nexa address. That token is the grant. Holding ≥ 1 TCTC
+          lets you post and take tickets.
         </p>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this page.</li>
           <li>Talk to the desk. We confirm you are real.</li>
-          <li>Give a Kadena k: or Kaspa address. You get 1 TCTC for free.</li>
+          <li>Give a Kadena, Kaspa, or Nexa address. You get 1 TCTC for free.</li>
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">

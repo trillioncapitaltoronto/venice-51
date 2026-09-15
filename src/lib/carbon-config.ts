@@ -54,14 +54,15 @@ export const TCTC_CHAINS: TctcChain[] = [
     id: "nexa",
     name: "Nexa",
     ticker: "TCTC",
-    tokenId: "",
+    tokenId: "nexa:tpc29y9ahl0m62av6qv4n44vhl9yx8fl2prcvdmfm2zkggg75qqqq3f2seyj9",
     supply: 1_000_000,
-    decimals: 0,
-    dexName: "",
-    dexUrl: "",
+    decimals: 2,
+    dexName: "Nexa explorer",
+    dexUrl:
+      "https://explorer.nexa.org/token/nexa:tpc29y9ahl0m62av6qv4n44vhl9yx8fl2prcvdmfm2zkggg75qqqq3f2seyj9",
     explorerName: "Nexa explorer",
-    parentWallet: "",
-    ready: false,
+    parentWallet: "nexa:nqtsq5g5f2rgn0e2mhqkhy85ggay0se46f4vaymz4e74jsh5",
+    ready: true,
   },
 ];
 
@@ -74,7 +75,7 @@ export const KAS_TCTC = TCTC_CHAINS[1];
 export const CARBON_DEFAULTS = {
   kas: "TCTC",
   kda: KDA_TCTC_MODULE,
-  nexa: TCTC_CHAINS.find((c) => c.id === "nexa")?.tokenId ?? "TCTC",
+  nexa: "nexa:tpc29y9ahl0m62av6qv4n44vhl9yx8fl2prcvdmfm2zkggg75qqqq3f2seyj9",
 } as const;
 
 export function tctcChain(id: string) {

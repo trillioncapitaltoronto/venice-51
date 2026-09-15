@@ -27,14 +27,13 @@ function PassPage() {
           from the parent wallet. No purchase. No Google. No X.
         </p>
         <p className="mt-3 text-sm text-muted">
-          {CARBON_SUPPLY_TOTAL.toLocaleString()} across three chains. Kadena and
-          Kaspa are live. Nexa gets the same treatment once that token id is
-          posted here.
+          {CARBON_SUPPLY_TOTAL.toLocaleString()} across three chains. Kadena,
+          Kaspa, and Nexa are live.
         </p>
         <ol className="mt-8 list-decimal space-y-3 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME}.</li>
           <li>Talk to the desk. Real person, you’re in.</li>
-          <li>Give a Kadena k: or Kaspa address. We send 1 TCTC from the parent wallet.</li>
+          <li>Give a Kadena, Kaspa, or Nexa address. We send 1 TCTC from the parent wallet.</li>
           <li>That wallet is the pass. Post a ticket with it.</li>
         </ol>
         <div className="mt-10 space-y-4">

@@ -96,26 +96,52 @@ async function checkNexa(address: string, group: string): Promise<CarbonCheck> {
   const addr = address.trim();
   const grp = group.trim();
   if (!grp) return { ok: false, balance: "0", error: "Need the Nexa token group id." };
-  const url = `https://explorer.nexa.org/ext/getaddress/${encodeURIComponent(addr)}`;
+  const headers = {
+    accept: "text/html,application/json",
+    cookie: "nx_human=1",
+  };
   try {
-    const res = await fetch(url, { headers: { accept: "application/json" } });
-    if (!res.ok) {
-      return {
-        ok: false,
-        balance: "0",
-        error: "Nexa explorer did not return a token balance. Confirm the group id.",
-      };
-    }
-    const json = (await res.json()) as { tokens?: Array<{ group?: string; token?: string; balance?: string | number }> };
-    const row = (json.tokens ?? []).find(
-      (t) => t.group === grp || t.token === grp || t.group?.includes(grp),
+    const res = await fetch(
+      `https://explorer.nexa.org/address/${encodeURIComponent(addr)}`,
+      { headers },
     );
-    const n = parseAmount(row?.balance);
-    if (n > 0) return { ok: true, balance: String(row?.balance) };
-    return { ok: false, balance: "0", error: "No Carbon token on this Nexa address." };
+    const html = await res.text();
+    const fromRow = nexaAmountFromHtml(html, grp);
+    if (fromRow >= 1) return { ok: true, balance: String(fromRow) };
+    const tok = await fetch(
+      `https://explorer.nexa.org/token/${encodeURIComponent(grp)}`,
+      { headers },
+    );
+    const tokenHtml = await tok.text();
+    const fromToken = nexaAmountForAddress(tokenHtml, addr);
+    if (fromToken >= 1) return { ok: true, balance: String(fromToken) };
+    return { ok: false, balance: "0", error: "No TCTC (need ≥ 1) on this Nexa address." };
   } catch (e) {
     return { ok: false, balance: "0", error: e instanceof Error ? e.message : "Nexa lookup failed." };
   }
+}
+
+function nexaAmountFromHtml(html: string, group: string) {
+  const tickerHit = html.match(
+    new RegExp(`data-ticker="TCTC"[^>]*>[\\s\\S]{0,400}?([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*TCTC`, "i"),
+  );
+  if (tickerHit) return Number(tickerHit[1].replace(/,/g, ""));
+  const groupHit = html.match(
+    new RegExp(`${group.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]{0,300}?([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*TCTC`, "i"),
+  );
+  if (groupHit) return Number(groupHit[1].replace(/,/g, ""));
+  return 0;
+}
+
+function nexaAmountForAddress(html: string, address: string) {
+  const needle = address.replace(/^nexa:/, "");
+  const re = new RegExp(
+    `${needle}[\\s\\S]{0,400}?([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*TCTC|([0-9][0-9,]*(?:\\.[0-9]+)?)\\s*TCTC[\\s\\S]{0,400}?${needle}`,
+    "i",
+  );
+  const m = html.match(re);
+  const raw = m?.[1] || m?.[2];
+  return raw ? Number(raw.replace(/,/g, "")) : 0;
 }
 
 export async function verifyCarbonHold(
