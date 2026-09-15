@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Shell } from "@/components/shell";
-import { DISCORD_NAME } from "@/lib/carbon-config";
+import { TwoDoors } from "@/components/two-doors";
+import { DISCORD_NAME, TCTC_GRANT } from "@/lib/carbon-config";
 
 export const Route = createFileRoute("/guide")({ component: Guide });
 
@@ -40,6 +41,16 @@ function Guide() {
               holder still share one unit. The board number is the ask. The
               print you actually trade is whatever you agree in Discord.
             </p>
+          </section>
+          <section>
+            <h2 className="mb-2 text-foreground">Two doors onto the floor</h2>
+            <p className="mb-4">
+              Door 1 is {TCTC_GRANT.toLocaleString()} TCTC in a Kadena, Kaspa,
+              or Nexa wallet — automatic if you are posting those coins. Door 2
+              is the desk key, for WART, HNS, XMR, ERG, ETI, BCH. Same Discord
+              talk either way.
+            </p>
+            <TwoDoors />
           </section>
           <section>
             <h2 className="mb-2 text-foreground">TCTC is the grant — 10,000, free</h2>

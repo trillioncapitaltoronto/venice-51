@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Board } from "@/components/board";
 import { OfferForm } from "@/components/offer-form";
 import { Shell } from "@/components/shell";
+import { TwoDoors } from "@/components/two-doors";
 import { Button } from "@/components/ui/button";
 import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS, TCTC_GRANT } from "@/lib/carbon-config";
 import { COINS } from "@/lib/coins";
@@ -31,12 +32,11 @@ function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          Post KAS, KDA, or NEXA from a wallet that holds ≥{" "}
-          {TCTC_GRANT.toLocaleString()} TCTC and you’re on the desk
-          automatically. WART, HNS, XMR and the rest: same Discord talk, then
-          a desk grant — the key stays for those. Buyer sends BCH. Volunteers
-          welcome.
+          Two ways onto the floor. Pick the door that matches the coin.
         </p>
+        <div className="mt-6 max-w-4xl">
+          <TwoDoors />
+        </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>
             {posting ? "Hide ticket form" : "Post a ticket"}

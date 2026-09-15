@@ -15,6 +15,7 @@ import {
   TCTC_GRANT,
   type CarbonChain,
 } from "@/lib/carbon-config";
+import { TwoDoors } from "@/components/two-doors";
 import { checkDeskPass } from "@/lib/pass";
 
 export const Route = createFileRoute("/pass")({ component: PassPage });
@@ -28,12 +29,13 @@ function PassPage() {
           The token is the grant. {TCTC_GRANT.toLocaleString()} TCTC. Free.
         </h1>
         <p className="mt-3 text-sm text-muted">
-          {CARBON_TICKER} — {CARBON_NAME} — is the club pass. Pick Kadena,
-          Kaspa, or Nexa. Join {DISCORD_NAME}, we confirm you are real, then we
-          send {TCTC_GRANT.toLocaleString()} TCTC from that chain’s parent
-          wallet. Holding ≥ {TCTC_GRANT.toLocaleString()} on the chain you
-          picked lets you post. No purchase. No Google. No X.
+          {CARBON_TICKER} — {CARBON_NAME} — is door 1. {TCTC_GRANT.toLocaleString()}{" "}
+          TCTC, free, on Kadena, Kaspa, or Nexa. Door 2 is the desk key, for
+          WART, HNS, XMR and the rest. Either door works. No Google. No X.
         </p>
+        <div className="mt-6">
+          <TwoDoors />
+        </div>
         <p className="mt-3 text-sm text-muted">
           {CARBON_SUPPLY_TOTAL.toLocaleString()} across three chains. All three
           are live.

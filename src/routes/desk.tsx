@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS, TCTC_GRANT } from "@/lib/carbon-config";
 import { grantPoster, listPosters, revokePoster } from "@/lib/desk";
 import { Shell } from "@/components/shell";
+import { TwoDoors } from "@/components/two-doors";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
 
@@ -17,15 +18,12 @@ function DeskPage() {
         <p className="font-mono text-xs tracking-[0.22em] text-muted">THE CLUB</p>
         <h1 className="mt-3 text-3xl font-medium tracking-tight">Two doors. Same floor.</h1>
         <p className="mt-3 text-sm text-muted">
-          Door 1 is the token. They pick Kadena, Kaspa, or Nexa. After we talk
-          in Discord we send {TCTC_GRANT.toLocaleString()} TCTC to that wallet.
-          Venice reads the chain. That’s the key — coins, not a password.
+          Discord is where we meet. Then pick a door. Either one lets you post
+          and take tickets.
         </p>
-        <p className="mt-3 text-sm text-muted">
-          Door 2 is a desk grant. For people who are not on those three
-          wallets. Same Discord talk. You type their name with the desk key.
-          They can post without TCTC.
-        </p>
+        <div className="mt-6">
+          <TwoDoors />
+        </div>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME}.</li>
           <li>Talk to the desk. Real person.</li>
