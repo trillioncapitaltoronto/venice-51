@@ -38,7 +38,6 @@ export function OfferForm({ onDone }: { onDone?: () => void }) {
             price: String(fd.get("price")).trim(),
             notes: String(fd.get("notes") ?? ""),
             discord: String(fd.get("discord")).trim(),
-            referredBy: String(fd.get("referredBy")).trim(),
             wallet: String(fd.get("wallet")).trim(),
           },
         });
@@ -83,13 +82,9 @@ export function OfferForm({ onDone }: { onDone?: () => void }) {
           <Label htmlFor="price">Ask in BCH (per coin)</Label>
           <Input id="price" name="price" required placeholder="0.00008" inputMode="decimal" />
         </div>
-        <div>
+        <div className="sm:col-span-2">
           <Label htmlFor="discord">{`${DISCORD_NAME} username`}</Label>
           <Input id="discord" name="discord" required placeholder="username" />
-        </div>
-        <div>
-          <Label htmlFor="referredBy">Posted referral (must already be in the chain)</Label>
-          <Input id="referredBy" name="referredBy" required placeholder="who vouched" />
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="wallet">Wallet to watch (the coins for sale)</Label>

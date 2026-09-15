@@ -14,10 +14,10 @@ function Guide() {
           <section>
             <h2 className="mb-2 text-foreground">What this is</h2>
             <p>
-              Venice 51 is a small public floor for leftover PoW, quoted Coin /
-              BCH. You get in on a referral. You trade in {DISCORD_NAME} with
-              witnesses. There is no escrow. Honesty is paramount. A thief hates
-              a room that saw the sale.
+              Venice 51 is a public floor for leftover PoW, quoted Coin / BCH.
+              Referral is a Discord thing — someone in {DISCORD_NAME} brings you
+              in. The website is the books. There is no escrow. Honesty is
+              paramount. A thief hates a room that saw the sale.
             </p>
           </section>
           <section>

@@ -144,7 +144,6 @@ function BookSide({
                 <span className="truncate text-muted">
                   {ticketCode(row.id)}
                   {row.funded ? " · F" : ""}
-                  {row.vouched ? " · V" : ""}
                 </span>
                 <span className="text-right">{row.amount}</span>
                 <span className={cn("text-right", side === "buy" ? "text-buy" : "text-sell")}>

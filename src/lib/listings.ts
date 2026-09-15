@@ -3,7 +3,6 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { QUOTES, TICKERS } from "@/lib/coins";
 import { fundedEnough, watchBalance } from "@/lib/proof";
-import { ensureClub, requireReferral } from "@/lib/club";
 
 const amountRe = /^\d+(\.\d{1,8})?$/;
 const handleRe = /^[A-Za-z0-9_@.\-+]{2,64}$/;
@@ -98,7 +97,6 @@ export const listListings = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sql = await getSql();
     await ensureWalletCols(sql);
-    await ensureClub(sql);
     const coin = data.coin && TICKERS.includes(data.coin as never) ? data.coin : null;
     const side = data.side === "buy" || data.side === "sell" ? data.side : null;
     const clauses = ["l.status = 'open'"];
@@ -173,7 +171,6 @@ export const getListing = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sql = await getSql();
     await ensureWalletCols(sql);
-    await ensureClub(sql);
     const rows = await sql<{
       id: number;
       side: string;
@@ -236,7 +233,6 @@ const offerInput = z.object({
   price: z.string().regex(amountRe, "Price must be a decimal"),
   notes: z.string().max(280),
   discord: z.string().regex(handleRe, "Discord name looks wrong"),
-  referredBy: z.string().regex(handleRe, "Referral Discord looks wrong"),
   wallet: z.string().min(8).max(128),
 });
 
@@ -245,10 +241,7 @@ export const postOffer = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const sql = await getSql();
     await ensureWalletCols(sql);
-    await ensureClub(sql);
     const discord = data.discord.replace(/^@/, "");
-    const referredBy = data.referredBy.replace(/^@/, "");
-    await requireReferral(sql, discord, referredBy);
     const wallet = data.wallet.trim();
     const proof = await watchBalance(data.coin, wallet);
     const verified = proof.ok && fundedEnough(proof.balance, data.amount);
@@ -260,7 +253,7 @@ export const postOffer = createServerFn({ method: "POST" })
       ) values (
         ${discord}, ${data.side}, ${data.coin}, ${data.amount},
         ${data.quoteAsset}, ${data.price}, 'onchain', ${data.notes.trim()},
-        'discord', ${discord}, ${referredBy}, 'open',
+        'discord', ${discord}, '', 'open',
         ${wallet}, ${proof.balance}, ${verified}, now()
       )
       returning id

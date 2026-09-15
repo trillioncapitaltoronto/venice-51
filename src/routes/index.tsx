@@ -24,11 +24,12 @@ function Home() {
       <main className="relative z-10 mx-auto max-w-6xl px-4 py-10">
         <p className="font-mono text-xs tracking-[0.22em] text-flare">SECTOR 51 · LAGUNA</p>
         <h1 className="mt-3 max-w-3xl text-4xl font-medium tracking-tight sm:text-5xl">
-          A public floor for referred traders.
+          A public floor for leftover PoW.
         </h1>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          Agree in Discord. Buyer sends BCH. Referral chain is the door.
+          Agree in Discord. Buyer sends BCH. Referral happens in the room, not
+          on this site.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>
@@ -59,7 +60,7 @@ function Home() {
           <section className="mt-8 rounded-xl border border-border bg-card p-5">
             <h2 className="text-lg font-medium">New ticket</h2>
             <p className="mb-4 text-sm text-muted">
-              Coin, size, BCH ask, your Discord, who referred you.
+              Coin, size, BCH ask, Discord, wallet to watch.
             </p>
             <OfferForm onDone={() => setPosting(false)} />
           </section>

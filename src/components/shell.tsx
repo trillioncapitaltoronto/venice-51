@@ -47,9 +47,8 @@ export function Shell({ children }: { children: ReactNode }) {
             className="h-8 w-auto"
           />
           <p className="text-center text-xs text-muted">
-            Venice 51 is a Trillion Capital venue — public sales, referred names,
-            Coin / BCH. Witnesses beat thieves. Honesty is paramount. Floor is{" "}
-            {DISCORD_NAME}. No escrow.
+            Venice 51 is a Trillion Capital venue — Coin / BCH books, Discord
+            floor. Referral is in {DISCORD_NAME}, not here. No escrow.
           </p>
         </div>
       </footer>

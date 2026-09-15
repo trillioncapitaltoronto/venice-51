@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { coinName } from "@/lib/coins";
 import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
 import { discordOpener, ticketCode } from "@/lib/handshake";
-import { confirmVouch, vouchChain } from "@/lib/club";
 import { getListing } from "@/lib/listings";
 import { markFilled } from "@/lib/trust";
 import { Shell } from "@/components/shell";
@@ -66,15 +65,6 @@ function ListingPage() {
               Funded
             </span>
           ) : null}
-          {row.vouched ? (
-            <span className="ml-2 rounded-md border border-buy/40 px-2 py-1 font-mono text-xs uppercase text-buy">
-              Vouched
-            </span>
-          ) : (
-            <span className="ml-2 rounded-md border border-sell/40 px-2 py-1 font-mono text-xs uppercase text-sell">
-              Waiting on vouch
-            </span>
-          )}
           <h1 className="mt-4 text-3xl font-medium tracking-tight">
             {row.amount} {row.coin}
           </h1>
@@ -96,7 +86,6 @@ function ListingPage() {
               <dt className="text-xs uppercase tracking-wider text-muted">{DISCORD_NAME}</dt>
               <dd className="font-mono">
                 {row.discord} · {row.fills} fill{row.fills === 1 ? "" : "s"}
-                {row.referredBy ? ` · via ${row.referredBy}` : ""}
               </dd>
             </div>
           </dl>
@@ -122,13 +111,6 @@ function ListingPage() {
           </div>
         </section>
         <TrustBox listingId={listingId} open={row.status === "open"} onChange={() => qc.invalidateQueries()} />
-        <VouchBox
-          listingId={listingId}
-          referredBy={row.referredBy}
-          discord={row.discord}
-          vouched={row.vouched}
-          onChange={() => qc.invalidateQueries()}
-        />
       </main>
     </Shell>
   );
@@ -197,67 +179,3 @@ function TrustBox({
   );
 }
 
-function VouchBox({
-  listingId,
-  referredBy,
-  discord,
-  vouched,
-  onChange,
-}: {
-  listingId: number;
-  referredBy: string;
-  discord: string;
-  vouched: boolean;
-  onChange: () => void;
-}) {
-  const chain = useQuery({
-    queryKey: ["chain", discord],
-    queryFn: () => vouchChain({ data: { discord } }),
-    enabled: Boolean(discord),
-  });
-  const mut = useMutation({
-    mutationFn: confirmVouch,
-    onSuccess: onChange,
-  });
-  return (
-    <section className="mt-6 rounded-xl border border-border bg-card p-5">
-      <h2 className="text-lg font-medium">The chain</h2>
-      <p className="mt-1 text-sm text-muted">
-        Someone’s name is on the line for {discord}. That is the only door.
-        {chain.data && chain.data.length > 0
-          ? ` Lineage: ${chain.data.join(" ← ")}.`
-          : ""}
-      </p>
-      {vouched ? (
-        <p className="mt-3 text-sm text-buy">Vouched by {referredBy}.</p>
-      ) : (
-        <form
-          className="mt-4 grid gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const fd = new FormData(e.currentTarget);
-            mut.mutate({
-              data: { listingId, referrer: String(fd.get("referrer")) },
-            });
-          }}
-        >
-          <p className="text-sm text-muted">
-            Only @{referredBy} can confirm this person is solid. Type that name.
-          </p>
-          <div>
-            <Label htmlFor="referrer">I am the referrer</Label>
-            <Input id="referrer" name="referrer" required defaultValue={referredBy} />
-          </div>
-          {mut.isError ? (
-            <p className="text-sm text-sell">
-              {mut.error instanceof Error ? mut.error.message : "Could not vouch"}
-            </p>
-          ) : null}
-          <Button type="submit" disabled={mut.isPending}>
-            {mut.isPending ? "Vouching…" : `I vouch. My name is on ${discord}.`}
-          </Button>
-        </form>
-      )}
-    </section>
-  );
-}
