@@ -44,6 +44,13 @@ function DeskKey() {
         </section>
         <GrantBox />
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
+          <img src="/plutus-lockup.png" alt="Plutus" className="h-16 w-auto" />
+          <p className="mt-3 text-sm text-muted">
+            Plutus — Trillion Capital research and development division. This
+            desk is theirs.
+          </p>
+        </section>
+        <section className="mt-8 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-medium">Volunteers welcome</h2>
           <p className="mt-2 text-sm text-muted">
             This desk is new. If you can write, design, check explorers, keep

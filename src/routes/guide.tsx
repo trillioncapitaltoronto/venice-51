@@ -12,6 +12,14 @@ function Guide() {
         <h1 className="mt-3 text-4xl font-medium tracking-tight">A club, not an escrow.</h1>
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted">
           <section>
+            <h2 className="mb-2 text-foreground">Plutus</h2>
+            <p>
+              Venice 51 is built by Plutus — the Trillion Capital research and
+              development division. The desk, the books, the explorers.
+            </p>
+            <img src="/plutus-lockup.png" alt="Plutus" className="mt-4 h-24 w-auto" />
+          </section>
+          <section>
             <h2 className="mb-2 text-foreground">What this is</h2>
             <p>
               Venice 51 is a BCH OTC desk swap line — providing liquidity

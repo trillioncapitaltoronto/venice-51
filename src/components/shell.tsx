@@ -14,7 +14,12 @@ export function Shell({ children }: { children: ReactNode }) {
             <img
               src="/tctc-lockup.png"
               alt="Trillion Capital Toronto Corporation"
-              className="h-5 w-auto sm:h-6"
+              className="hidden h-5 w-auto sm:block sm:h-6"
+            />
+            <img
+              src="/plutus-mark.png"
+              alt="Plutus"
+              className="h-8 w-8 rounded-full sm:h-9 sm:w-9"
             />
           </Link>
           <nav className="flex items-center gap-1 text-sm">
@@ -40,15 +45,23 @@ export function Shell({ children }: { children: ReactNode }) {
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
-        <div className="relative flex flex-col items-center gap-3 px-4 py-10">
-          <img
-            src="/tctc-lockup.png"
-            alt="Trillion Capital Toronto Corporation"
-            className="h-8 w-auto"
-          />
-          <p className="text-center text-xs text-muted">
-            Venice 51 is a Trillion Capital venue — Coin / BCH books, Discord
-            floor. TCTC is required and free. Volunteers welcome. No escrow.
+        <div className="relative flex flex-col items-center gap-4 px-4 py-10">
+          <div className="flex flex-wrap items-center justify-center gap-8">
+            <img
+              src="/tctc-lockup.png"
+              alt="Trillion Capital Toronto Corporation"
+              className="h-8 w-auto"
+            />
+            <img
+              src="/plutus-lockup.png"
+              alt="Plutus"
+              className="h-20 w-auto"
+            />
+          </div>
+          <p className="max-w-xl text-center text-xs text-muted">
+            Venice 51 is a Trillion Capital venue. Plutus is the Trillion Capital
+            research and development division. Coin / BCH books, Discord floor.
+            TCTC is required and free. Volunteers welcome. No escrow.
           </p>
         </div>
       </footer>

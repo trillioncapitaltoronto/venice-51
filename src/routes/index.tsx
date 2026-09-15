@@ -55,6 +55,13 @@ function Home() {
           Want to help make Venice 51 better? Volunteers are welcome — code,
           explorers, honesty in the room. Join Discord and say so.
         </p>
+        <div className="mt-8 flex flex-wrap items-center gap-6">
+          <img src="/plutus-lockup.png" alt="Plutus" className="h-16 w-auto" />
+          <p className="max-w-sm text-xs text-muted">
+            Built by Plutus — Trillion Capital research and development
+            division.
+          </p>
+        </div>
         <div className="mt-8 overflow-hidden border-y border-border py-3">
           <div className="flex gap-6 font-mono text-xs text-muted">
             {COINS.map((c) => (

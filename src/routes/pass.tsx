@@ -30,6 +30,10 @@ function PassPage() {
           <li>Talk to the desk. We verify you are a real person.</li>
           <li>You get TCTC for free. Then you can post and trade.</li>
         </ol>
+        <img src="/plutus-lockup.png" alt="Plutus" className="mt-8 h-16 w-auto" />
+        <p className="mt-2 text-xs text-muted">
+          Plutus — Trillion Capital research and development division.
+        </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
             <Button type="button">Join {DISCORD_NAME}</Button>
