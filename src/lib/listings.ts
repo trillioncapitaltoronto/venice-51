@@ -268,8 +268,9 @@ const offerInput = z.object({
   notes: z.string().max(280),
   discord: z.string().regex(handleRe, "Discord name looks wrong"),
   wallet: z.string().min(8).max(160),
-  passChain: z.enum(["kda", "kas", "nexa"]).optional(),
+  passChain: z.enum(["kda", "kas", "nexa"]).optional().or(z.literal("")),
   passAddress: z.string().max(160).optional(),
+  deskKey: z.string().max(200).optional(),
 });
 
 export const postOffer = createServerFn({ method: "POST" })
@@ -278,10 +279,14 @@ export const postOffer = createServerFn({ method: "POST" })
     const sql = await getSql();
     await ensureWalletCols(sql);
     const discord = data.discord.replace(/^@/, "");
+    if (data.deskKey?.trim()) {
+      const { grantImpl } = await import("./desk.server");
+      await grantImpl(data.deskKey.trim(), discord);
+    }
     const floor = await (await import("./floor")).assertFloorAccess({
       sql,
       discord,
-      passChain: data.passChain,
+      passChain: data.passChain || undefined,
       passAddress: data.passAddress,
       listingCoin: data.coin,
       listingWallet: data.wallet,

@@ -49,8 +49,9 @@ export function OfferForm({
             notes: String(fd.get("notes") ?? ""),
             discord: String(fd.get("discord")).trim(),
             wallet,
-            passChain: autoChain ?? (String(fd.get("passChain")) as "kda" | "kas" | "nexa"),
+            passChain: autoChain ?? (String(fd.get("passChain") || "") as "kda" | "kas" | "nexa" | ""),
             passAddress: autoChain ? wallet : String(fd.get("passAddress") ?? "").trim(),
+            deskKey: String(fd.get("deskKey") ?? "").trim(),
           },
         });
       }}
@@ -122,17 +123,20 @@ export function OfferForm({
         {autoChain ? (
           <p className="sm:col-span-2 text-sm text-muted">
             Posting {coin}. ≥ {TCTC_GRANT.toLocaleString()} TCTC on this wallet
-            opens the desk. No TCTC? Use a desk grant on your Discord name.
+            opens the desk. No TCTC? Paste the desk key below.
           </p>
         ) : (
           <div className="sm:col-span-2 grid gap-2">
             <p className="text-sm text-muted">
-              {coin} doesn’t live on the TCTC chains. Door 2: desk grant on
-              this Discord name after we talk. TCTC wallet is optional extra.
+              {coin}: TCTC wallet optional. Or paste the desk key (door 2).
             </p>
             <TctcFields />
           </div>
         )}
+        <div className="sm:col-span-2">
+          <Label htmlFor="deskKey">Desk key — door 2, if you have it</Label>
+          <Input id="deskKey" name="deskKey" type="password" autoComplete="off" placeholder="leave blank if you hold TCTC" />
+        </div>
       </div>
       <div>
         <Label htmlFor="notes">Notes</Label>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Board } from "@/components/board";
 import { OfferForm } from "@/components/offer-form";
@@ -13,14 +12,13 @@ import { COINS } from "@/lib/coins";
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-  const [posting, setPosting] = useState(false);
   return (
     <Shell>
       <section className="relative isolate overflow-hidden">
         <img
           src="/art-hero.jpg"
           alt="Venice 51 — canal, refinery, hangar"
-          className="h-96 w-full object-cover object-center brightness-110 contrast-110"
+          className="h-72 w-full object-cover object-center brightness-110 contrast-110 sm:h-96"
         />
         <div className="hero-wash pointer-events-none absolute inset-0" />
       </section>
@@ -32,11 +30,34 @@ function Home() {
         <p className="mt-4 max-w-2xl font-mono text-sm tracking-wide text-flare">
           BCH OTC desk swap line. Providing liquidity where it doesn’t exist.
         </p>
-        <p className="mt-4 max-w-2xl text-base text-muted">
-          Price in BCH. Books look like an exchange — bids left, asks right.
-          Two ways onto the floor. Pick the door that matches the coin.
-        </p>
-        <div className="mt-6 max-w-4xl">
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
+            <Button type="button" variant="outline">
+              Join {DISCORD_NAME}
+            </Button>
+          </a>
+          <Link to="/tape">
+            <Button type="button" variant="outline">
+              Tape
+            </Button>
+          </Link>
+          <Link to="/guide">
+            <Button type="button" variant="outline">
+              How the desk works
+            </Button>
+          </Link>
+        </div>
+        <section className="mt-8 rounded-xl border border-border bg-card p-5">
+          <h2 className="text-lg font-medium">Post a bid or an ask</h2>
+          <p className="mb-4 text-sm text-muted">
+            I am buying or I am selling. Coin, size, BCH price, Discord, wallet.
+          </p>
+          <OfferForm />
+        </section>
+        <section className="mt-10">
+          <Board />
+        </section>
+        <div className="mt-10 max-w-4xl">
           <TwoDoors />
         </div>
         <div className="mt-8">
@@ -45,24 +66,8 @@ function Home() {
         <div className="mt-8 max-w-3xl">
           <PitchBox />
         </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button type="button" onClick={() => setPosting((v) => !v)}>
-            {posting ? "Hide ticket form" : "Post a ticket"}
-          </Button>
-          <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
-            <Button type="button" variant="outline">
-              Join {DISCORD_NAME}
-            </Button>
-          </a>
-          <Link to="/guide">
-            <Button type="button" variant="outline">
-              How the desk works
-            </Button>
-          </Link>
-        </div>
-        <p className="mt-6 max-w-2xl text-sm text-muted">
-          Want to help make Venice 51 better? Volunteers are welcome — code,
-          explorers, honesty in the room. Join Discord and say so.
+        <p className="mt-8 max-w-2xl text-sm text-muted">
+          Volunteers welcome — code, explorers, honesty in the room.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-6">
           <img src="/plutus-lockup.png" alt="Plutus" className="h-16 w-auto" />
@@ -108,19 +113,6 @@ function Home() {
             </div>
           ))}
         </div>
-        {posting ? (
-          <section className="mt-8 rounded-xl border border-border bg-card p-5">
-            <h2 className="text-lg font-medium">New ticket</h2>
-            <p className="mb-4 text-sm text-muted">
-              I am selling or I am buying. Coin, size, BCH price, Discord,
-              wallet we watch.
-            </p>
-            <OfferForm onDone={() => setPosting(false)} />
-          </section>
-        ) : null}
-        <section className="mt-10">
-          <Board />
-        </section>
       </main>
     </Shell>
   );
