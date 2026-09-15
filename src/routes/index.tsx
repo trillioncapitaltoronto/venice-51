@@ -26,6 +26,9 @@ function Home() {
         <h1 className="mt-3 max-w-4xl text-3xl font-medium tracking-tight sm:text-5xl">
           The digital commodity midstream pipeline for upstream miners to sell to downstream consumers.
         </h1>
+        <p className="mt-4 max-w-2xl font-mono text-sm tracking-wide text-flare">
+          BCH OTC desk swap line. Providing liquidity where it doesn’t exist.
+        </p>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
           TCTC (Trillion Carbon) is required to be on the floor — and it is

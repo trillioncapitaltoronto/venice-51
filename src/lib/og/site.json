@@ -3,5 +3,5 @@
   "type": "website",
   "card": "custom",
   "color": "0c0c0d",
-  "description": "OTC in BCH for coins the exchanges dropped"
+  "description": "BCH OTC desk swap line. Providing liquidity where it doesn't exist."
 }

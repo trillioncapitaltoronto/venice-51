@@ -1,6 +1,6 @@
 # Venice 51
 
-Public Coin / BCH board for leftover PoW. Referral chain, watch-only funded wallets, Discord floor. No escrow. No custody.
+BCH OTC desk swap line. Providing liquidity where it doesn't exist. Watch-only funded wallets, Discord floor. No escrow. No custody.
 
 Live: after Render connects this repo, the service URL is the site.
 

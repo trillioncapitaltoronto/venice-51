@@ -14,7 +14,8 @@ function Guide() {
           <section>
             <h2 className="mb-2 text-foreground">What this is</h2>
             <p>
-              Venice 51 is a public floor for leftover PoW, quoted Coin / BCH.
+              Venice 51 is a BCH OTC desk swap line — providing liquidity
+              where it doesn’t exist. Quoted Coin / BCH.
               You join {DISCORD_NAME} with the invite on this site. The desk
               talks to you and verifies you are real. The website is the books.
               There is no escrow. Honesty is paramount. Volunteers who want to
