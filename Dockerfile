@@ -5,7 +5,8 @@ RUN npm ci
 COPY . .
 ENV NODE_ENV=production
 ENV VITE_AUTH_ENABLED=false
+ENV NITRO_PRESET=node-server
 RUN npm run build
 ENV PORT=10000
 EXPOSE 10000
-CMD ["npm", "start"]
+CMD ["node", ".output/server/index.mjs"]
