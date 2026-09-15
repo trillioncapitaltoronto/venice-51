@@ -36,9 +36,9 @@ export async function ensurePosters(sql: Sql) {
 
 export async function isGranted(sql: Sql, discord: string) {
   if (!deskKey()) return true;
-  await ensurePosters(sql);
   const name = discord.replace(/^@/, "").toLowerCase();
   if (envPosters().includes(name)) return true;
+  await ensurePosters(sql);
   const rows = await sql<{ n: number }>`
     select count(*)::int as n from posters where lower(discord) = ${name}
   `;
