@@ -17,7 +17,7 @@ export function TctcFields() {
       </div>
       <div>
         <Label htmlFor="passAddress">TCTC wallet (must hold ≥ 1)</Label>
-        <Input id="passAddress" name="passAddress" required placeholder="k:…" />
+        <Input id="passAddress" name="passAddress" required placeholder="k:… or kaspa:…" />
       </div>
     </>
   );

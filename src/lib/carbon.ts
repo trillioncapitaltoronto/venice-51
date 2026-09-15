@@ -24,7 +24,10 @@ async function checkKas(address: string, tick: string): Promise<CarbonCheck> {
   const res = await fetch(url, { headers: { accept: "application/json" } });
   const json = (await res.json()) as {
     message?: string;
-    result?: { balance?: string; locked?: string } | null;
+    result?:
+      | { balance?: string; locked?: string; dec?: string }
+      | Array<{ balance?: string; locked?: string; dec?: string }>
+      | null;
   };
   if (json.message === "tick invalid") {
     return { ok: false, balance: "0", error: `No KRC-20 named ${ticker} on Kaspa.` };
@@ -32,12 +35,14 @@ async function checkKas(address: string, tick: string): Promise<CarbonCheck> {
   if (json.message === "address invalid") {
     return { ok: false, balance: "0", error: "That Kaspa address is not valid." };
   }
-  const raw = json.result?.balance ?? "0";
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n <= 0) {
-    return { ok: false, balance: "0", error: `No ${ticker} on this Kaspa address.` };
+  const row = Array.isArray(json.result) ? json.result[0] : json.result;
+  const raw = Number(row?.balance ?? "0");
+  const dec = Number(row?.dec ?? 8);
+  const human = Number.isFinite(raw) && Number.isFinite(dec) ? raw / 10 ** dec : NaN;
+  if (!Number.isFinite(human) || human < 1) {
+    return { ok: false, balance: "0", error: `No ${ticker} (need ≥ 1) on this Kaspa address.` };
   }
-  return { ok: true, balance: String(raw) };
+  return { ok: true, balance: String(human) };
 }
 
 async function checkKda(address: string, moduleName: string): Promise<CarbonCheck> {

@@ -50,8 +50,9 @@ function Guide() {
               <span className="break-all font-mono text-xs text-foreground">
                 n_d8d407d0445ed92ba102c2ce678591d69e464006.TRILLIONCARBON
               </span>
-              , listed on Mercatus. Kaspa and Nexa get the same ids on the pass
-              page when they are posted. No Google. No X.
+              , listed on Mercatus. Kaspa TCTC is live on kaspa.com (KRC-20
+              ticker TCTC). Nexa gets the same id on the pass page when it is
+              posted. No Google. No X.
             </p>
           </section>
           <section>

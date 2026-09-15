@@ -81,6 +81,9 @@ function Home() {
               <p className="mt-1 font-mono text-xs break-all">
                 {c.tokenId || "token id coming"}
               </p>
+              {c.parentWallet ? (
+                <p className="mt-1 font-mono text-[10px] break-all text-muted">{c.parentWallet}</p>
+              ) : null}
               {c.dexUrl ? (
                 <a
                   href={c.dexUrl}
