@@ -8,9 +8,14 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="flex items-baseline gap-3">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
             <span className="font-mono text-sm font-semibold tracking-[0.18em]">VENICE 51</span>
-            <span className="hidden text-xs text-muted sm:inline">Coin / BCH</span>
+            <span className="hidden h-4 w-px bg-border sm:block" />
+            <img
+              src="/tctc-lockup.png"
+              alt="Trillion Capital Toronto Corporation"
+              className="h-5 w-auto sm:h-6"
+            />
           </Link>
           <nav className="flex items-center gap-1 text-sm">
             <NavLink to="/">Board</NavLink>
@@ -35,10 +40,18 @@ export function Shell({ children }: { children: ReactNode }) {
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
-        <p className="relative px-4 py-10 text-center text-xs text-muted">
-          Venice 51 — public sales, referred names, Coin / BCH. Witnesses beat
-          thieves. Honesty is paramount. Floor is {DISCORD_NAME}. No escrow.
-        </p>
+        <div className="relative flex flex-col items-center gap-3 px-4 py-10">
+          <img
+            src="/tctc-lockup.png"
+            alt="Trillion Capital Toronto Corporation"
+            className="h-8 w-auto"
+          />
+          <p className="text-center text-xs text-muted">
+            Venice 51 is a Trillion Capital venue — public sales, referred names,
+            Coin / BCH. Witnesses beat thieves. Honesty is paramount. Floor is{" "}
+            {DISCORD_NAME}. No escrow.
+          </p>
+        </div>
       </footer>
     </div>
   );
