@@ -72,7 +72,7 @@ function PassPage() {
                 <div>
                   <dt className="uppercase tracking-wider">Parent wallet</dt>
                   <dd className="break-all text-foreground">
-                    {c.parentWallet || "Kadena parent k: still needed"}
+                    {c.parentWallet || "Parent still needed"}
                   </dd>
                 </div>
                 <div>

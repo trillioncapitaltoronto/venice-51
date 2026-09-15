@@ -44,12 +44,11 @@ export function TctcFields() {
       <TctcChainPicker value={chain} onChange={setChain} />
       <div>
         <Label htmlFor="passAddress">
-          {`${spec?.name ?? "TCTC"} wallet — must hold ≥ ${TCTC_GRANT.toLocaleString()} TCTC`}
+          {`${spec?.name ?? "TCTC"} wallet — ${TCTC_GRANT.toLocaleString()} TCTC, or leave blank if desk-granted`}
         </Label>
         <Input
           id="passAddress"
           name="passAddress"
-          required
           placeholder={
             chain === "kda" ? "k:…" : chain === "kas" ? "kaspa:…" : "nexa:…"
           }

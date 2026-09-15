@@ -36,7 +36,7 @@ export const TCTC_CHAINS: TctcChain[] = [
     dexUrl:
       "https://www.mercatus.works/token-info/n_d8d407d0445ed92ba102c2ce678591d69e464006.TRILLIONCARBON",
     explorerName: "Kadena explorer",
-    parentWallet: "",
+    parentWallet: "k:828686347e98ace3ded478ee1018859a9388b3aca02dcc621f406f525518c53d",
     ready: true,
   },
   {

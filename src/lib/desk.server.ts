@@ -46,7 +46,7 @@ function writeFilePosters(rows: FilePoster[]) {
 }
 
 export async function isGranted(_sql: unknown, discord: string) {
-  if (!deskKey()) return true;
+  if (!deskKey()) return false;
   const name = discord.replace(/^@/, "").toLowerCase();
   if (envPosters().includes(name)) return true;
   return readFilePosters().some((p) => p.discord.toLowerCase() === name);

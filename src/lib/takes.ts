@@ -68,17 +68,16 @@ export const postTake = createServerFn({ method: "POST" })
     discord: string;
     wallet: string;
     notes: string;
-    passChain: CarbonChain;
-    passAddress: string;
+    passChain?: CarbonChain | "";
+    passAddress?: string;
   }) => {
     const discord = input.discord.trim().replace(/^@/, "");
     if (!handleRe.test(discord)) throw new Error("Discord name looks wrong.");
     const wallet = input.wallet.trim();
     if (wallet.length < 8 || wallet.length > 160) throw new Error("Wallet looks wrong.");
-    const passAddress = input.passAddress.trim();
-    if (passAddress.length < 8) throw new Error("TCTC wallet looks wrong.");
-    const passChain = input.passChain;
-    if (passChain !== "kda" && passChain !== "kas" && passChain !== "nexa") {
+    const passAddress = (input.passAddress ?? "").trim();
+    const passChain = input.passChain || undefined;
+    if (passChain && passChain !== "kda" && passChain !== "kas" && passChain !== "nexa") {
       throw new Error("Pick Kadena, Kaspa, or Nexa for TCTC.");
     }
     return {
@@ -93,8 +92,12 @@ export const postTake = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const sql = await getSql();
     await ensureTakes(sql);
-    const { requireTctcPass } = await import("./carbon");
-    await requireTctcPass(data.passChain, data.passAddress);
+    await (await import("./floor")).assertFloorAccess({
+      sql,
+      discord: data.discord,
+      passChain: data.passChain,
+      passAddress: data.passAddress,
+    });
     const listing = await sql<{ id: number; contact_handle: string; status: string }>`
       select id, contact_handle, status from listings where id = ${data.listingId}
     `;

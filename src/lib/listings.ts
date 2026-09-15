@@ -3,7 +3,6 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { QUOTES, TICKERS } from "@/lib/coins";
 import { fundedEnough, watchBalance } from "@/lib/proof";
-import type { CarbonChain } from "@/lib/carbon-config";
 
 const amountRe = /^\d+(\.\d{1,8})?$/;
 const handleRe = /^[A-Za-z0-9_@.\-+]{2,64}$/;
@@ -269,8 +268,8 @@ const offerInput = z.object({
   notes: z.string().max(280),
   discord: z.string().regex(handleRe, "Discord name looks wrong"),
   wallet: z.string().min(8).max(160),
-  passChain: z.enum(["kda", "kas", "nexa"]),
-  passAddress: z.string().min(8).max(160),
+  passChain: z.enum(["kda", "kas", "nexa"]).optional(),
+  passAddress: z.string().max(160).optional(),
 });
 
 export const postOffer = createServerFn({ method: "POST" })
@@ -279,8 +278,12 @@ export const postOffer = createServerFn({ method: "POST" })
     const sql = await getSql();
     await ensureWalletCols(sql);
     const discord = data.discord.replace(/^@/, "");
-    const { requireTctcPass } = await import("./carbon");
-    const pass = await requireTctcPass(data.passChain as CarbonChain, data.passAddress);
+    const floor = await (await import("./floor")).assertFloorAccess({
+      sql,
+      discord,
+      passChain: data.passChain,
+      passAddress: data.passAddress,
+    });
     const wallet = data.wallet.trim();
     const proof = await watchBalance(data.coin, wallet);
     const verified = proof.ok && fundedEnough(proof.balance, data.amount);
@@ -295,9 +298,9 @@ export const postOffer = createServerFn({ method: "POST" })
         ${data.quoteAsset}, ${data.price}, 'onchain', ${data.notes.trim()},
         'discord', ${discord}, '', 'open',
         ${wallet}, ${proof.balance}, ${verified}, now(),
-        ${data.passChain}, ${data.passAddress.trim()}, ${true}
+        ${data.passChain ?? floor.passChain}, ${data.passAddress?.trim() || floor.passAddress}, ${floor.passHeld}
       )
       returning id
     `;
-    return { id: rows[0].id, funded: verified, proofError: verified ? null : proof.error ?? "Wallet is short of the size.", passBalance: pass.balance };
+    return { id: rows[0].id, funded: verified, proofError: verified ? null : proof.error ?? "Wallet is short of the size.", via: floor.via };
   });

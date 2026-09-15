@@ -31,11 +31,10 @@ function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          TCTC (Trillion Carbon) is the grant — {TCTC_GRANT.toLocaleString()}{" "}
-          TCTC per person, free. Pick Kadena, Kaspa, or Nexa. Join Discord. We
-          talk to you, make sure you are real, then we send the grant to that
-          chain. Hold ≥ {TCTC_GRANT.toLocaleString()} and you can post. Buyer
-          sends BCH. Volunteers who want to help build this are welcome.
+          TCTC (Trillion Carbon) is door 1 — {TCTC_GRANT.toLocaleString()} TCTC
+          per person, free, on Kadena, Kaspa, or Nexa. Door 2 is a desk grant
+          for people not on those wallets. Join Discord. We talk. Then one of
+          those two doors. Buyer sends BCH. Volunteers welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="button" onClick={() => setPosting((v) => !v)}>
