@@ -18,21 +18,21 @@ function DeskKey() {
         <h1 className="mt-3 text-3xl font-medium tracking-tight">Join the room. We verify you there.</h1>
         <p className="mt-3 text-sm text-muted">
           Click the invite. Walk in. We talk to you, make sure you are a real
-          person, then you are in. After that the desk grants your Discord name
-          once. That is permission to buy and sell — not a pass per ticket.
-          TCTC is required and free.
+          person. Then we send 1 TCTC from the parent wallet to your Kadena
+          k: address. That token is the grant — not a name we type into a box.
+          Holding ≥ 1 TCTC lets you post and take tickets. Kaspa and Nexa
+          follow when those ids are on the pass page.
         </p>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this page.</li>
           <li>Talk to the desk. We confirm you are real.</li>
-          <li>You get TCTC for free. One grant. Then you can buy and sell.</li>
+          <li>Give a Kadena k: address. You get 1 TCTC for free.</li>
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-medium">Approved members</h2>
           <p className="mt-2 text-sm text-muted">
-            Names the desk granted after a live conversation. One grant.
-            They can buy and sell from then on.
+            Legacy name list. The live grant is TCTC on-chain. Kadena first.
           </p>
           <ul className="mt-3 space-y-1 font-mono text-sm">
             {(posters.data ?? []).length === 0 ? (
@@ -115,10 +115,9 @@ function GrantBox() {
         else grant.mutate({ data: { deskKey, discord } });
       }}
     >
-      <h2 className="text-lg font-medium">Desk grant</h2>
+      <h2 className="text-lg font-medium">Desk override</h2>
       <p className="mt-1 text-sm text-muted">
-        After you verify them in Discord, type their name here. Once. They can
-        post, bid, and offer from then on.
+        Only if the chain check is down. Normal path: send them 1 TCTC.
       </p>
       <div className="mt-3">
         <Label htmlFor="deskKey">Desk key</Label>

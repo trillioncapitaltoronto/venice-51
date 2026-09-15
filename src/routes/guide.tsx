@@ -42,13 +42,16 @@ function Guide() {
             </p>
           </section>
           <section>
-            <h2 className="mb-2 text-foreground">TCTC is required — and free</h2>
+            <h2 className="mb-2 text-foreground">TCTC is the grant — and free</h2>
             <p>
-              Trillion Capital Trillion Carbon is the club pass. You need TCTC
-              to be on Venice 51. We give it to you after we talk in{" "}
-              {DISCORD_NAME} and confirm you are real. No purchase. Three
-              million tokens — one million each on Kadena, Kaspa, and Nexa. No
-              Google. No X.
+              Trillion Carbon is the club pass. Venice checks the chain. Hold ≥ 1
+              TCTC and you can post. We give it to you after we talk in{" "}
+              {DISCORD_NAME}. No purchase. Kadena is live:{" "}
+              <span className="break-all font-mono text-xs text-foreground">
+                n_d8d407d0445ed92ba102c2ce678591d69e464006.TRILLIONCARBON
+              </span>
+              , listed on Mercatus. Kaspa and Nexa get the same ids on the pass
+              page when they are posted. No Google. No X.
             </p>
           </section>
           <section>

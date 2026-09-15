@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { CARBON_DEFAULTS, type CarbonChain } from "@/lib/carbon-config";
+import { CARBON_DEFAULTS, tctcChain, type CarbonChain } from "@/lib/carbon-config";
 
 export type { CarbonChain };
 export { CARBON_DEFAULTS } from "@/lib/carbon-config";
@@ -59,8 +59,9 @@ async function checkKda(address: string, moduleName: string): Promise<CarbonChec
     },
     networkId: "mainnet01",
   });
-  const hash = createHash("blake2s256").update(cmd).digest("base64url");
+  const hash = createHash("blake2s256").update(cmd).digest("hex");
   const hosts = [
+    "https://api.chainweb-community.org/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
     "https://api.chainweb.com/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
     "https://us-e1.chainweb.com/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
   ];
@@ -121,4 +122,24 @@ export async function verifyCarbonHold(
   if (chain === "kas") return checkKas(address, ref);
   if (chain === "kda") return checkKda(address, ref);
   return checkNexa(address, ref);
+}
+
+/** Token is the grant. Hold ≥ 1 TCTC on a wired chain or you cannot post. */
+export async function requireTctcPass(chain: CarbonChain, address: string): Promise<CarbonCheck> {
+  const spec = tctcChain(chain);
+  if (!spec?.ready || !spec.tokenId) {
+    throw new Error(
+      `${spec?.name ?? chain} TCTC is not wired yet. Use Kadena, or wait for that chain’s token id.`,
+    );
+  }
+  const addr = address.trim();
+  if (addr.length < 8) throw new Error("TCTC wallet looks wrong.");
+  const check = await verifyCarbonHold(chain, addr, spec.tokenId);
+  if (!check.ok || Number(check.balance) < 1) {
+    throw new Error(
+      check.error ||
+        "This wallet does not hold TCTC. Join Discord, get 1 sent from the parent wallet, then post.",
+    );
+  }
+  return check;
 }

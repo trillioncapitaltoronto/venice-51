@@ -6,6 +6,7 @@ import { DISCORD_NAME } from "@/lib/carbon-config";
 import { postOffer } from "@/lib/listings";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/field";
+import { TctcFields } from "@/components/tctc-fields";
 
 export function OfferForm({
   onDone,
@@ -45,6 +46,8 @@ export function OfferForm({
             notes: String(fd.get("notes") ?? ""),
             discord: String(fd.get("discord")).trim(),
             wallet: String(fd.get("wallet")).trim(),
+            passChain: String(fd.get("passChain")) as "kda" | "kas" | "nexa",
+            passAddress: String(fd.get("passAddress")).trim(),
           },
         });
       }}
@@ -89,8 +92,11 @@ export function OfferForm({
           <Input id="price" name="price" required placeholder="0.00008" inputMode="decimal" />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="discord">{`${DISCORD_NAME} username (desk must have granted this name)`}</Label>
+          <Label htmlFor="discord">{`${DISCORD_NAME} username (how the room finds you)`}</Label>
           <Input id="discord" name="discord" required placeholder="username" />
+        </div>
+        <div className="sm:col-span-2">
+          <TctcFields />
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="wallet">Public wallet we watch on the chain explorer</Label>

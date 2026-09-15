@@ -4,7 +4,7 @@ import { Board } from "@/components/board";
 import { OfferForm } from "@/components/offer-form";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
+import { DISCORD_INVITE, DISCORD_NAME, TCTC_CHAINS } from "@/lib/carbon-config";
 import { COINS } from "@/lib/coins";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -31,9 +31,9 @@ function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-base text-muted">
           Price in BCH. Books look like an exchange — bids left, asks right.
-          TCTC (Trillion Carbon) is required to be on the floor — and it is
-          free. Join Discord. We talk to you, make sure you are real, then
-          you get TCTC. Buyer sends BCH. Volunteers who want to help build
+          TCTC (Trillion Carbon) is the grant — hold ≥ 1 and you can post. It
+          is free. Join Discord. We talk to you, make sure you are real, then
+          we send 1 TCTC. Buyer sends BCH. Volunteers who want to help build
           this are welcome.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
@@ -71,6 +71,30 @@ function Home() {
               </span>
             ))}
           </div>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {TCTC_CHAINS.map((c) => (
+            <div key={c.id} className="rounded-xl border border-border bg-card px-4 py-3">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                TCTC · {c.name}
+              </p>
+              <p className="mt-1 font-mono text-xs break-all">
+                {c.tokenId || "token id coming"}
+              </p>
+              {c.dexUrl ? (
+                <a
+                  href={c.dexUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-block text-xs text-flare underline"
+                >
+                  {c.dexName}
+                </a>
+              ) : (
+                <p className="mt-2 text-xs text-muted">Waiting on id</p>
+              )}
+            </div>
+          ))}
         </div>
         {posting ? (
           <section className="mt-8 rounded-xl border border-border bg-card p-5">

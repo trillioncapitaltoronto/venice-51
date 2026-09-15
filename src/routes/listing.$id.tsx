@@ -12,6 +12,7 @@ import { listTakes, postTake } from "@/lib/takes";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/field";
+import { TctcFields } from "@/components/tctc-fields";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/listing/$id")({ component: ListingPage });
@@ -67,6 +68,11 @@ function ListingPage() {
           {row.funded ? (
             <span className="ml-2 rounded-md border border-buy/40 px-2 py-1 font-mono text-xs uppercase text-buy">
               Funded
+            </span>
+          ) : null}
+          {row.passHeld ? (
+            <span className="ml-2 rounded-md border border-flare/40 px-2 py-1 font-mono text-xs uppercase text-flare">
+              TCTC pass
             </span>
           ) : null}
           <h1 className="mt-4 text-3xl font-medium tracking-tight">
@@ -132,8 +138,8 @@ function TakeBox({ row }: { row: PublicListing }) {
     <section className="mt-6 rounded-xl border border-border bg-card p-5">
       <h2 className="text-lg font-medium">{verb}</h2>
       <p className="mt-1 text-sm text-muted">
-        You are the other side of this ticket. Desk must have granted your
-        Discord name. Then you talk in the room or lock BCH in a 2-of-2.
+        You are the other side of this ticket. Your TCTC wallet must hold the
+        pass. Then you talk in the room or lock BCH in a 2-of-2.
       </p>
       <form
         className="mt-4 grid gap-3"
@@ -146,6 +152,8 @@ function TakeBox({ row }: { row: PublicListing }) {
               discord: String(fd.get("discord")),
               wallet: String(fd.get("wallet")),
               notes: String(fd.get("notes") ?? ""),
+              passChain: String(fd.get("passChain")) as "kda" | "kas" | "nexa",
+              passAddress: String(fd.get("passAddress")),
             },
           });
         }}
@@ -154,6 +162,7 @@ function TakeBox({ row }: { row: PublicListing }) {
           <Label htmlFor="takeDiscord">{`${DISCORD_NAME} username`}</Label>
           <Input id="takeDiscord" name="discord" required placeholder="username" />
         </div>
+        <TctcFields />
         <div>
           <Label htmlFor="takeWallet">Your public wallet</Label>
           <Input id="takeWallet" name="wallet" required placeholder="public address" />

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getSql } from "@/lib/db";
 import { QUOTES, TICKERS } from "@/lib/coins";
 import { fundedEnough, watchBalance } from "@/lib/proof";
+import type { CarbonChain } from "@/lib/carbon-config";
 
 const amountRe = /^\d+(\.\d{1,8})?$/;
 const handleRe = /^[A-Za-z0-9_@.\-+]{2,64}$/;
@@ -27,6 +28,9 @@ export type PublicListing = {
   wallet: string;
   walletBalance: string;
   walletError?: string;
+  passChain: string;
+  passAddress: string;
+  passHeld: boolean;
   vouched: boolean;
   fills: number;
 };
@@ -46,6 +50,15 @@ async function ensureWalletCols(sql: Awaited<ReturnType<typeof getSql>>) {
   );
   await sql.query(
     "alter table listings add column if not exists wallet_checked_at timestamptz",
+  );
+  await sql.query(
+    "alter table listings add column if not exists pass_chain text not null default ''",
+  );
+  await sql.query(
+    "alter table listings add column if not exists pass_address text not null default ''",
+  );
+  await sql.query(
+    "alter table listings add column if not exists pass_held boolean not null default false",
   );
   walletColsReady = true;
 }
@@ -67,6 +80,9 @@ function mapRow(r: {
   wallet_balance?: string;
   wallet_verified?: boolean;
   wallet_error?: string;
+  pass_chain?: string;
+  pass_address?: string;
+  pass_held?: boolean;
   vouch_confirmed?: boolean;
   fills?: number;
 }): PublicListing {
@@ -87,6 +103,9 @@ function mapRow(r: {
     wallet: r.wallet_address ?? "",
     walletBalance: r.wallet_balance ?? "",
     walletError: r.wallet_error,
+    passChain: r.pass_chain ?? "",
+    passAddress: r.pass_address ?? "",
+    passHeld: Boolean(r.pass_held),
     vouched: Boolean(r.vouch_confirmed),
     fills: Number(r.fills ?? 0),
   };
@@ -127,6 +146,9 @@ export const listListings = createServerFn({ method: "GET" })
       wallet_address: string;
       wallet_balance: string;
       wallet_verified: boolean;
+      pass_chain: string;
+      pass_address: string;
+      pass_held: boolean;
       vouch_confirmed: boolean;
       fills: number;
     }>(
@@ -135,6 +157,9 @@ export const listListings = createServerFn({ method: "GET" })
               coalesce(l.wallet_address,'') as wallet_address,
               coalesce(l.wallet_balance,'') as wallet_balance,
               coalesce(l.wallet_verified,false) as wallet_verified,
+              coalesce(l.pass_chain,'') as pass_chain,
+              coalesce(l.pass_address,'') as pass_address,
+              coalesce(l.pass_held,false) as pass_held,
               coalesce(l.vouch_confirmed,false) as vouch_confirmed,
               (
                 select count(*)::int from fills f
@@ -189,6 +214,9 @@ export const getListing = createServerFn({ method: "GET" })
       wallet_address: string;
       wallet_balance: string;
       wallet_verified: boolean;
+      pass_chain: string;
+      pass_address: string;
+      pass_held: boolean;
       vouch_confirmed: boolean;
       fills: number;
     }>`
@@ -197,6 +225,9 @@ export const getListing = createServerFn({ method: "GET" })
              coalesce(l.wallet_address,'') as wallet_address,
              coalesce(l.wallet_balance,'') as wallet_balance,
              coalesce(l.wallet_verified,false) as wallet_verified,
+             coalesce(l.pass_chain,'') as pass_chain,
+             coalesce(l.pass_address,'') as pass_address,
+             coalesce(l.pass_held,false) as pass_held,
              coalesce(l.vouch_confirmed,false) as vouch_confirmed,
              (
                select count(*)::int from fills f
@@ -238,6 +269,8 @@ const offerInput = z.object({
   notes: z.string().max(280),
   discord: z.string().regex(handleRe, "Discord name looks wrong"),
   wallet: z.string().min(8).max(160),
+  passChain: z.enum(["kda", "kas", "nexa"]),
+  passAddress: z.string().min(8).max(160),
 });
 
 export const postOffer = createServerFn({ method: "POST" })
@@ -246,10 +279,8 @@ export const postOffer = createServerFn({ method: "POST" })
     const sql = await getSql();
     await ensureWalletCols(sql);
     const discord = data.discord.replace(/^@/, "");
-    const { isGranted } = await import("./desk.server");
-    if (!(await isGranted(sql, discord))) {
-      throw new Error("Desk has not granted this Discord name yet. Join the room first.");
-    }
+    const { requireTctcPass } = await import("./carbon");
+    const pass = await requireTctcPass(data.passChain as CarbonChain, data.passAddress);
     const wallet = data.wallet.trim();
     const proof = await watchBalance(data.coin, wallet);
     const verified = proof.ok && fundedEnough(proof.balance, data.amount);
@@ -257,14 +288,16 @@ export const postOffer = createServerFn({ method: "POST" })
       insert into listings (
         user_id, side, coin, amount, quote_asset, price, settlement, notes,
         contact_channel, contact_handle, referred_by, status,
-        wallet_address, wallet_balance, wallet_verified, wallet_checked_at
+        wallet_address, wallet_balance, wallet_verified, wallet_checked_at,
+        pass_chain, pass_address, pass_held
       ) values (
         ${discord}, ${data.side}, ${data.coin}, ${data.amount},
         ${data.quoteAsset}, ${data.price}, 'onchain', ${data.notes.trim()},
         'discord', ${discord}, '', 'open',
-        ${wallet}, ${proof.balance}, ${verified}, now()
+        ${wallet}, ${proof.balance}, ${verified}, now(),
+        ${data.passChain}, ${data.passAddress.trim()}, ${true}
       )
       returning id
     `;
-    return { id: rows[0].id, funded: verified, proofError: verified ? null : proof.error ?? "Wallet is short of the size." };
+    return { id: rows[0].id, funded: verified, proofError: verified ? null : proof.error ?? "Wallet is short of the size.", passBalance: pass.balance };
   });

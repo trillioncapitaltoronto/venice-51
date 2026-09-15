@@ -9,7 +9,7 @@ export const EXPLORERS: Record<
   KDA: {
     name: "Kadena explorer",
     addressUrl: (a) =>
-      `https://explorer.chainweb.com/mainnet/account/${encodeURIComponent(a)}?token=coin`,
+      `https://explorer.chainweb-community.org/mainnet/account/${encodeURIComponent(a)}?token=coin`,
   },
   HNS: {
     name: "Shakeshift",
