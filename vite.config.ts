@@ -151,12 +151,19 @@ export default defineConfig(({ command, isPreview }) => ({
     port: 8080,
     strictPort: true,
   },
-  preview: {
-    host: "127.0.0.1",
-    port: 8081,
-    strictPort: true,
-    allowedHosts: true,
-  },
+  preview: process.env.PORT
+    ? {
+        host: "0.0.0.0",
+        port: Number(process.env.PORT),
+        strictPort: true,
+        allowedHosts: true,
+      }
+    : {
+        host: "127.0.0.1",
+        port: 8081,
+        strictPort: true,
+        allowedHosts: true,
+      },
   resolve: { tsconfigPaths: true },
   plugins: [
     pgliteBootstrapPlugin(),
