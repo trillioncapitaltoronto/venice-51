@@ -27,26 +27,49 @@ type Utxo = {
 
 async function fetchUtxos(address: string): Promise<{ utxos: Utxo[]; total: bigint }> {
   const bare = address.replace(/^bitcoincash:/, "");
-  const url = `https://api.blockchair.com/bitcoin-cash/dashboards/address/${bare}?limit=50`;
-  const res = await fetch(url, { headers: { accept: "application/json" } });
+  try {
+    const url = `https://api.blockchair.com/bitcoin-cash/dashboards/address/${bare}?limit=50`;
+    const res = await fetch(url, { headers: { accept: "application/json" } });
+    if (res.ok) {
+      const json = (await res.json()) as {
+        data?: Record<
+          string,
+          {
+            utxo?: Array<{ transaction_hash: string; index: number; value: number }>;
+            address?: { script_hex?: string };
+          }
+        >;
+      };
+      const row = json.data?.[bare] ?? json.data?.[address];
+      if (row) {
+        const script = row.address?.script_hex ?? "";
+        const utxos = (row.utxo ?? []).map((u) => ({
+          txId: u.transaction_hash,
+          outputIndex: u.index,
+          address,
+          script,
+          satoshis: u.value,
+        }));
+        const total = utxos.reduce((s, u) => s + BigInt(u.satoshis), 0n);
+        return { utxos, total };
+      }
+    }
+  } catch {
+    /* fullstack fallback */
+  }
+  const res = await fetch(
+    `https://api.fullstack.cash/v5/electrumx/utxos/${encodeURIComponent(address)}`,
+    { headers: { accept: "application/json" } },
+  );
   if (!res.ok) throw new Error("Could not read the BCH address.");
   const json = (await res.json()) as {
-    data?: Record<
-      string,
-      {
-        utxo?: Array<{ transaction_hash: string; index: number; value: number }>;
-        address?: { script_hex?: string };
-      }
-    >;
+    utxos?: Array<{ tx_hash: string; tx_pos: number; value: number }>;
   };
-  const row = json.data?.[bare] ?? json.data?.[address];
-  if (!row) return { utxos: [], total: 0n };
-  const script = row.address?.script_hex ?? "";
-  const utxos = (row.utxo ?? []).map((u) => ({
-    txId: u.transaction_hash,
-    outputIndex: u.index,
+  const utxos = (json.utxos ?? []).map((u) => ({
+    txId: u.tx_hash,
+    outputIndex: u.tx_pos,
     address,
-    script,
+    script: "",
     satoshis: u.value,
   }));
   const total = utxos.reduce((s, u) => s + BigInt(u.satoshis), 0n);
@@ -79,13 +102,32 @@ export async function spendTwoOfTwo(opts: {
     .to(opts.dest.trim(), send)
     .sign(priv);
   const raw = tx.serialize();
-  const res = await fetch("https://api.blockchair.com/bitcoin-cash/push/transaction", {
+  const hash = await broadcastRaw(String(raw));
+  return { txid: hash };
+}
+
+async function broadcastRaw(raw: string) {
+  try {
+    const res = await fetch("https://api.blockchair.com/bitcoin-cash/push/transaction", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ data: raw }),
+    });
+    const body = (await res.json()) as {
+      data?: { transaction_hash?: string };
+      context?: { error?: string };
+    };
+    if (body.data?.transaction_hash) return body.data.transaction_hash;
+  } catch {
+    /* fullstack */
+  }
+  const res = await fetch("https://api.fullstack.cash/v5/rawtransactions/sendRawTransaction", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ data: raw }),
+    body: JSON.stringify(raw),
   });
-  const body = (await res.json()) as { data?: { transaction_hash?: string }; context?: { error?: string } };
-  const hash = body.data?.transaction_hash;
-  if (!hash) throw new Error(body.context?.error ?? "Broadcast failed.");
-  return { txid: hash };
+  const body = (await res.json()) as string | { txid?: string; error?: string };
+  if (typeof body === "string" && /^[0-9a-f]{64}$/i.test(body)) return body;
+  if (typeof body === "object" && body.txid) return body.txid;
+  throw new Error(typeof body === "object" ? body.error ?? "Broadcast failed." : "Broadcast failed.");
 }

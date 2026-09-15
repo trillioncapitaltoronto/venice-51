@@ -73,9 +73,10 @@ function EscrowPage() {
         <p className="mt-6 font-mono text-xs tracking-[0.18em] text-muted">BCH 2-OF-2</p>
         <h1 className="mt-2 text-3xl font-medium tracking-tight">{row.amountBch} BCH</h1>
         <p className="mt-2 text-sm text-muted">
-          Payer key and payee key. Both must sign to move it. Venice has no key
-          and will not co-sign. If one of you disappears, the BCH stays in the
-          2-of-2.
+          Buyer is the BCH payer. Seller is the BCH payee. Each generates a
+          key in the browser, saves the WIF, publishes only the public key.
+          When both are in, the 2-of-2 address appears. Buyer funds it. Both
+          WIFs are required to move it. Venice has no key.
         </p>
         <p className="mt-3 font-mono text-xs uppercase text-muted">{row.status.replace("_", " ")}</p>
 
@@ -139,8 +140,17 @@ function KeySlot({
           </Button>
           {pair ? (
             <div className="mt-3 grid gap-2">
-              <p className="text-xs text-sell">Save the WIF. We never store it.</p>
+              <p className="text-xs text-sell">
+                Save this WIF now. If you lose it, the BCH is stuck. We never store it.
+              </p>
               <p className="break-all font-mono text-xs">WIF {pair.wif}</p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void navigator.clipboard.writeText(pair.wif)}
+              >
+                Copy WIF
+              </Button>
               <Button
                 type="button"
                 disabled={busy}

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { coinName } from "@/lib/coins";
 import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
 import { discordOpener, ticketCode } from "@/lib/handshake";
 import { explorerFor } from "@/lib/explorers";
+import { openEscrow, escrowForListing } from "@/lib/escrow";
 import { getListing, type PublicListing } from "@/lib/listings";
 import { markFilled } from "@/lib/trust";
 import { Shell } from "@/components/shell";
@@ -89,8 +90,9 @@ function ListingPage() {
         <section className="mt-6 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-medium">Do it in public</h2>
           <p className="mt-1 text-sm text-muted">
-            Agree the print in {DISCORD_NAME}. Buyer sends BCH. Seller sends the
-            coin. Witnesses in the room. No keys, no escrow.
+            Agree the print in {DISCORD_NAME}. Default: buyer sends BCH, seller
+            sends the coin, witnesses in the room. Optional: lock the BCH in a
+            2-of-2. Venice has no key and will not co-sign.
           </p>
           <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-muted">
             <li>Paste {code} in the room so people see the sale.</li>
@@ -103,11 +105,38 @@ function ListingPage() {
             <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
               <Button type="button">Open {DISCORD_NAME}</Button>
             </a>
+            <LockBch listingId={listingId} />
           </div>
         </section>
         <TrustBox listingId={listingId} open={row.status === "open"} onChange={() => qc.invalidateQueries()} />
       </main>
     </Shell>
+  );
+}
+
+function LockBch({ listingId }: { listingId: number }) {
+  const nav = useNavigate();
+  const existing = useQuery({
+    queryKey: ["escrow-for", listingId],
+    queryFn: () => escrowForListing({ data: { listingId } }),
+  });
+  const open = useMutation({
+    mutationFn: () => openEscrow({ data: { listingId } }),
+    onSuccess: (res) => {
+      void nav({ to: "/escrow/$id", params: { id: String(res.id) } });
+    },
+  });
+  if (existing.data?.id) {
+    return (
+      <Link to="/escrow/$id" params={{ id: String(existing.data.id) }}>
+        <Button type="button">Open the 2-of-2</Button>
+      </Link>
+    );
+  }
+  return (
+    <Button type="button" variant="outline" disabled={open.isPending} onClick={() => open.mutate()}>
+      {open.isPending ? "Opening…" : "Lock BCH in a 2-of-2"}
+    </Button>
   );
 }
 

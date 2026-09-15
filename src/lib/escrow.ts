@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSql } from "@/lib/db";
+import { getSql, type Sql } from "@/lib/db";
 import { escrowBalance, spendTwoOfTwo, twoOfTwoAddress } from "@/lib/bch";
 
 export type Escrow = {
@@ -32,6 +32,26 @@ function mapEscrow(r: {
   };
 }
 
+let escrowReady = false;
+
+async function ensureEscrow(sql: Sql) {
+  if (escrowReady) return;
+  await sql.query(`
+    create table if not exists bch_escrows (
+      id serial primary key,
+      listing_id int not null,
+      amount_bch text not null,
+      payer_pub text,
+      payee_pub text,
+      desk_pub text not null default '',
+      address text,
+      status text not null default 'waiting_keys',
+      created_at timestamptz not null default now()
+    )
+  `);
+  escrowReady = true;
+}
+
 export const getDeskPubkey = createServerFn({ method: "GET" }).handler(async () => null);
 
 export const setDeskPubkey = createServerFn({ method: "POST" })
@@ -44,6 +64,7 @@ export const getEscrow = createServerFn({ method: "GET" })
   .validator((input: { id: number }) => input)
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     const rows = await sql<{
       id: number;
       listing_id: number;
@@ -61,6 +82,7 @@ export const escrowForListing = createServerFn({ method: "GET" })
   .validator((input: { listingId: number }) => input)
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     const rows = await sql<{
       id: number;
       listing_id: number;
@@ -83,6 +105,7 @@ export const openEscrow = createServerFn({ method: "POST" })
   .validator((input: { listingId: number }) => input)
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     const listing = await sql<{ amount: string; price: string; status: string }>`
       select amount, price, status from listings where id = ${data.listingId}
     `;
@@ -115,6 +138,7 @@ export const addEscrowKey = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     const rows = await sql<{
       id: number;
       payer_pub: string | null;
@@ -150,6 +174,7 @@ export const markEscrow = createServerFn({ method: "POST" })
   .validator((input: { id: number; status: "funded" | "released" | "refunded" }) => input)
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     await sql`
       update bch_escrows set status = ${data.status}
       where id = ${data.id} and status in ('waiting_fund','funded')
@@ -175,6 +200,7 @@ export const spendEscrow = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const sql = await getSql();
+    await ensureEscrow(sql);
     const rows = await sql<{
       address: string | null;
       payer_pub: string | null;
