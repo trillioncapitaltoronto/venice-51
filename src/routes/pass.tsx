@@ -7,6 +7,9 @@ import {
   CARBON_TICKER,
   DISCORD_INVITE,
   DISCORD_NAME,
+  KDA_TCTC_DEX,
+  KDA_TCTC_MODULE,
+  KDA_TCTC_SUPPLY,
 } from "@/lib/carbon-config";
 
 export const Route = createFileRoute("/pass")({ component: PassPage });
@@ -20,15 +23,18 @@ function PassPage() {
         <p className="mt-3 text-sm text-muted">
           {CARBON_TICKER} — Trillion Capital Trillion Carbon — is the club
           pass. You need it to be on Venice 51. We give it to you. No purchase.
-          Join {DISCORD_NAME}, we confirm you are real, then you get TCTC.
-          {CARBON_SUPPLY_TOTAL.toLocaleString()} total,{" "}
-          {CARBON_SUPPLY_PER_CHAIN.toLocaleString()} each on Kadena, Kaspa, and
-          Nexa. No Google. No X.
+          Join {DISCORD_NAME}, we confirm you are real, then we send 1 TCTC from
+          the parent wallet. Holding it is the pass.
+        </p>
+        <p className="mt-3 font-mono text-xs leading-relaxed text-muted">
+          Kadena module {KDA_TCTC_MODULE}. {KDA_TCTC_SUPPLY.toLocaleString()} on
+          Kadena. {CARBON_SUPPLY_TOTAL.toLocaleString()} total across Kadena,
+          Kaspa, and Nexa ({CARBON_SUPPLY_PER_CHAIN.toLocaleString()} class each).
         </p>
         <ol className="mt-8 list-decimal space-y-3 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this site.</li>
           <li>Talk to the desk. We verify you are a real person.</li>
-          <li>You get TCTC for free. Then you can post and trade.</li>
+          <li>Give a Kadena k: address. We send 1 TCTC. Then you can post.</li>
         </ol>
         <img src="/plutus-lockup.png" alt="Plutus" className="mt-8 h-16 w-auto" />
         <p className="mt-2 text-xs text-muted">
@@ -37,6 +43,11 @@ function PassPage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
             <Button type="button">Join {DISCORD_NAME}</Button>
+          </a>
+          <a href={KDA_TCTC_DEX} target="_blank" rel="noreferrer">
+            <Button type="button" variant="outline">
+              TCTC on Mercatus
+            </Button>
           </a>
           <Link to="/">
             <Button type="button" variant="outline">
