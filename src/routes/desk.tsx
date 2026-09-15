@@ -29,14 +29,14 @@ function DeskKey() {
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-lg font-medium">Who can post</h2>
+          <h2 className="text-lg font-medium">Approved members</h2>
           <p className="mt-2 text-sm text-muted">
-            Only names the desk granted after a live conversation. One grant
-            covers every ticket after that.
+            Names the desk granted after a live conversation. One grant.
+            They can buy and sell from then on.
           </p>
           <ul className="mt-3 space-y-1 font-mono text-sm">
             {(posters.data ?? []).length === 0 ? (
-              <li className="text-muted">Nobody yet.</li>
+              <li className="text-muted">No approved members yet.</li>
             ) : (
               (posters.data ?? []).map((p) => <li key={p.discord}>@{p.discord}</li>)
             )}
