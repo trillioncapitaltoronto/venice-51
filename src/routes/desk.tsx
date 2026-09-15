@@ -19,18 +19,20 @@ function DeskKey() {
         <p className="mt-3 text-sm text-muted">
           Click the invite. Walk in. We talk to you, make sure you are a real
           person, then you are in. After that the desk grants your Discord name
-          so you can post. TCTC is required and free.
+          once. That is permission to buy and sell — not a pass per ticket.
+          TCTC is required and free.
         </p>
         <ol className="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted">
           <li>Join {DISCORD_NAME} with the invite on this page.</li>
           <li>Talk to the desk. We confirm you are real.</li>
-          <li>You get TCTC for free. We grant your Discord name to post.</li>
+          <li>You get TCTC for free. One grant. Then you can buy and sell.</li>
           <li>Trade in the room. Price in BCH. Buyer sends BCH.</li>
         </ol>
         <section className="mt-8 rounded-xl border border-border bg-card p-5">
           <h2 className="text-lg font-medium">Who can post</h2>
           <p className="mt-2 text-sm text-muted">
-            Only names the desk granted after a live conversation.
+            Only names the desk granted after a live conversation. One grant
+            covers every ticket after that.
           </p>
           <ul className="mt-3 space-y-1 font-mono text-sm">
             {(posters.data ?? []).length === 0 ? (
@@ -108,8 +110,8 @@ function GrantBox() {
     >
       <h2 className="text-lg font-medium">Desk grant</h2>
       <p className="mt-1 text-sm text-muted">
-        After you verify them in Discord, type their name here. That is the
-        permission to post.
+        After you verify them in Discord, type their name here. Once. They can
+        post, bid, and offer from then on.
       </p>
       <div className="mt-3">
         <Label htmlFor="deskKey">Desk key</Label>
