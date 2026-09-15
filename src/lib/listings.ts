@@ -283,6 +283,8 @@ export const postOffer = createServerFn({ method: "POST" })
       discord,
       passChain: data.passChain,
       passAddress: data.passAddress,
+      listingCoin: data.coin,
+      listingWallet: data.wallet,
     });
     const wallet = data.wallet.trim();
     const proof = await watchBalance(data.coin, wallet);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { COINS } from "@/lib/coins";
-import { DISCORD_NAME } from "@/lib/carbon-config";
+import { DISCORD_NAME, TCTC_GRANT, chainFromCoin } from "@/lib/carbon-config";
 import { postOffer } from "@/lib/listings";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/field";
@@ -19,6 +19,8 @@ export function OfferForm({
   const qc = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [side, setSide] = useState<"buy" | "sell">(initialSide);
+  const [coin, setCoin] = useState("WART");
+  const autoChain = chainFromCoin(coin);
   const mut = useMutation({
     mutationFn: postOffer,
     onSuccess: async (res) => {
@@ -36,18 +38,19 @@ export function OfferForm({
         e.preventDefault();
         setError(null);
         const fd = new FormData(e.currentTarget);
+        const wallet = String(fd.get("wallet")).trim();
         mut.mutate({
           data: {
             side,
-            coin: String(fd.get("coin")),
+            coin,
             amount: String(fd.get("amount")).trim(),
             quoteAsset: "BCH",
             price: String(fd.get("price")).trim(),
             notes: String(fd.get("notes") ?? ""),
             discord: String(fd.get("discord")).trim(),
-            wallet: String(fd.get("wallet")).trim(),
-            passChain: String(fd.get("passChain")) as "kda" | "kas" | "nexa",
-            passAddress: String(fd.get("passAddress")).trim(),
+            wallet,
+            passChain: autoChain ?? (String(fd.get("passChain")) as "kda" | "kas" | "nexa"),
+            passAddress: autoChain ? wallet : String(fd.get("passAddress") ?? "").trim(),
           },
         });
       }}
@@ -75,7 +78,13 @@ export function OfferForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="coin">Coin</Label>
-          <Select id="coin" name="coin" required defaultValue="WART">
+          <Select
+            id="coin"
+            name="coin"
+            required
+            value={coin}
+            onChange={(e) => setCoin(e.target.value)}
+          >
             {COINS.map((c) => (
               <option key={c.ticker} value={c.ticker}>
                 {c.ticker} — {c.name}
@@ -96,12 +105,30 @@ export function OfferForm({
           <Input id="discord" name="discord" required placeholder="username" />
         </div>
         <div className="sm:col-span-2">
-          <TctcFields />
+          <Label htmlFor="wallet">
+            {autoChain
+              ? `Public ${coin} wallet — we check ≥ ${TCTC_GRANT.toLocaleString()} TCTC on it`
+              : "Public wallet we watch on the chain explorer"}
+          </Label>
+          <Input
+            id="wallet"
+            name="wallet"
+            required
+            placeholder={
+              autoChain === "kda" ? "k:…" : autoChain === "kas" ? "kaspa:…" : autoChain === "nexa" ? "nexa:…" : "public address"
+            }
+          />
         </div>
-        <div className="sm:col-span-2">
-          <Label htmlFor="wallet">Public wallet we watch on the chain explorer</Label>
-          <Input id="wallet" name="wallet" required placeholder="public address" />
-        </div>
+        {autoChain ? (
+          <p className="sm:col-span-2 text-sm text-muted">
+            Posting {coin}. If this wallet holds ≥ {TCTC_GRANT.toLocaleString()} TCTC,
+            you’re on the desk automatically.
+          </p>
+        ) : (
+          <div className="sm:col-span-2">
+            <TctcFields />
+          </div>
+        )}
       </div>
       <div>
         <Label htmlFor="notes">Notes</Label>

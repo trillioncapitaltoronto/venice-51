@@ -83,3 +83,18 @@ export const CARBON_DEFAULTS = {
 export function tctcChain(id: string) {
   return TCTC_CHAINS.find((c) => c.id === id) ?? null;
 }
+
+export function chainFromAddress(addr: string): CarbonChain | null {
+  const a = addr.trim().toLowerCase();
+  if (a.startsWith("k:")) return "kda";
+  if (a.startsWith("kaspa:")) return "kas";
+  if (a.startsWith("nexa:")) return "nexa";
+  return null;
+}
+
+export function chainFromCoin(coin: string): CarbonChain | null {
+  if (coin === "KDA") return "kda";
+  if (coin === "KAS") return "kas";
+  if (coin === "NEXA") return "nexa";
+  return null;
+}

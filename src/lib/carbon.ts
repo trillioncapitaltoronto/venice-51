@@ -50,43 +50,56 @@ async function checkKda(address: string, moduleName: string): Promise<CarbonChec
   const acct = address.trim();
   if (!mod) return { ok: false, balance: "0", error: "Need the Kadena pact module." };
   if (!acct) return { ok: false, balance: "0", error: "Need a Kadena account (k:…)." };
-  const cmd = JSON.stringify({
-    payload: { exec: { data: {}, code: `(${mod}.get-balance "${acct}")` } },
-    nonce: `venice-${Date.now()}`,
-    signers: [],
-    meta: {
-      chainId: "2",
-      sender: acct.replace(/"/g, ""),
-      gasLimit: 1500,
-      gasPrice: 1e-8,
-      ttl: 600,
-      creationTime: Math.floor(Date.now() / 1000),
-    },
-    networkId: "mainnet01",
-  });
-  const hash = createHash("blake2s256").update(cmd).digest("hex");
+  const chains = ["2", "0", "1"];
   const hosts = [
-    "https://api.chainweb-community.org/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
-    "https://api.chainweb.com/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
-    "https://us-e1.chainweb.com/chainweb/0.0/mainnet01/chain/2/pact/api/v1/local",
+    "https://api.chainweb-community.org",
+    "https://api.chainweb.com",
+    "https://us-e1.chainweb.com",
   ];
   let last = "Kadena node unreachable.";
-  for (const url of hosts) {
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ cmd, hash, sigs: [] }),
-      });
-      const json = (await res.json()) as { result?: { status?: string; data?: unknown; error?: { message?: string } } };
-      if (json.result?.status === "success") {
-        const n = parseAmount(json.result.data);
-        if (n > 0) return { ok: true, balance: String(n) };
-        return { ok: false, balance: "0", error: `No Carbon in ${mod} on this Kadena account.` };
+  for (const chainId of chains) {
+    const cmd = JSON.stringify({
+      payload: { exec: { data: {}, code: `(${mod}.get-balance "${acct}")` } },
+      nonce: `venice-${Date.now()}`,
+      signers: [],
+      meta: {
+        chainId,
+        sender: "sender00",
+        gasLimit: 15000,
+        gasPrice: 0.00000001,
+        ttl: 600,
+        creationTime: Math.floor(Date.now() / 1000),
+      },
+      networkId: "mainnet01",
+    });
+    const hashes = [
+      createHash("blake2s256").update(cmd).digest("hex"),
+      createHash("blake2s256").update(cmd).digest("base64url"),
+    ];
+    for (const host of hosts) {
+      for (const hash of hashes) {
+        try {
+          const res = await fetch(
+            `${host}/chainweb/0.0/mainnet01/chain/${chainId}/pact/api/v1/local`,
+            {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ cmd, hash, sigs: [] }),
+            },
+          );
+          const json = (await res.json()) as {
+            result?: { status?: string; data?: unknown; error?: { message?: string } };
+          };
+          if (json.result?.status === "success") {
+            const n = parseAmount(json.result.data);
+            if (n >= 1) return { ok: true, balance: String(n) };
+            return { ok: false, balance: "0", error: `No TCTC on this Kadena account (chain ${chainId}).` };
+          }
+          last = json.result?.error?.message ?? `Kadena returned ${res.status}`;
+        } catch (e) {
+          last = e instanceof Error ? e.message : "Kadena lookup failed.";
+        }
       }
-      last = json.result?.error?.message ?? `Kadena returned ${res.status}`;
-    } catch (e) {
-      last = e instanceof Error ? e.message : "Kadena lookup failed.";
     }
   }
   return { ok: false, balance: "0", error: last };

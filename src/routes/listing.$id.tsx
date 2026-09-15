@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { coinName } from "@/lib/coins";
-import { DISCORD_INVITE, DISCORD_NAME } from "@/lib/carbon-config";
+import { DISCORD_INVITE, DISCORD_NAME, TCTC_GRANT, chainFromCoin } from "@/lib/carbon-config";
 import { discordOpener, ticketCode } from "@/lib/handshake";
 import { explorerFor } from "@/lib/explorers";
 import { openEscrow, escrowForListing } from "@/lib/escrow";
@@ -133,13 +133,15 @@ function TakeBox({ row }: { row: PublicListing }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["takes", row.id] }),
   });
   if (row.status !== "open") return null;
+  const autoChain = chainFromCoin(row.coin);
   const verb = row.side === "sell" ? "Buy this offer" : "Sell into this bid";
   return (
     <section className="mt-6 rounded-xl border border-border bg-card p-5">
       <h2 className="text-lg font-medium">{verb}</h2>
       <p className="mt-1 text-sm text-muted">
-        You are the other side of this ticket. Your TCTC wallet must hold the
-        pass. Then you talk in the room or lock BCH in a 2-of-2.
+        {autoChain
+          ? `Posting on ${row.coin}. We check ≥ ${TCTC_GRANT.toLocaleString()} TCTC on the wallet you paste. That’s the door.`
+          : `You are the other side of this ticket. Hold ≥ ${TCTC_GRANT.toLocaleString()} TCTC on a chain you pick, or use a desk grant.`}
       </p>
       <form
         className="mt-4 grid gap-3"
@@ -152,8 +154,8 @@ function TakeBox({ row }: { row: PublicListing }) {
               discord: String(fd.get("discord")),
               wallet: String(fd.get("wallet")),
               notes: String(fd.get("notes") ?? ""),
-              passChain: String(fd.get("passChain")) as "kda" | "kas" | "nexa",
-              passAddress: String(fd.get("passAddress")),
+              passChain: autoChain ?? (String(fd.get("passChain")) as "kda" | "kas" | "nexa"),
+              passAddress: autoChain ? String(fd.get("wallet")) : String(fd.get("passAddress") ?? ""),
             },
           });
         }}
@@ -162,9 +164,13 @@ function TakeBox({ row }: { row: PublicListing }) {
           <Label htmlFor="takeDiscord">{`${DISCORD_NAME} username`}</Label>
           <Input id="takeDiscord" name="discord" required placeholder="username" />
         </div>
-        <TctcFields />
+        {autoChain ? null : <TctcFields />}
         <div>
-          <Label htmlFor="takeWallet">Your public wallet</Label>
+          <Label htmlFor="takeWallet">
+            {autoChain
+              ? `Your ${row.coin} wallet (≥ ${TCTC_GRANT.toLocaleString()} TCTC)`
+              : "Your public wallet"}
+          </Label>
           <Input id="takeWallet" name="wallet" required placeholder="public address" />
         </div>
         <div>

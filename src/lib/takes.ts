@@ -92,20 +92,27 @@ export const postTake = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const sql = await getSql();
     await ensureTakes(sql);
-    await (await import("./floor")).assertFloorAccess({
-      sql,
-      discord: data.discord,
-      passChain: data.passChain,
-      passAddress: data.passAddress,
-    });
-    const listing = await sql<{ id: number; contact_handle: string; status: string }>`
-      select id, contact_handle, status from listings where id = ${data.listingId}
+    const listing = await sql<{
+      id: number;
+      contact_handle: string;
+      status: string;
+      coin: string;
+    }>`
+      select id, contact_handle, status, coin from listings where id = ${data.listingId}
     `;
     const row = listing[0];
     if (!row || row.status !== "open") throw new Error("Ticket is not open.");
     if (row.contact_handle.toLowerCase() === data.discord.toLowerCase()) {
       throw new Error("That's your own ticket.");
     }
+    await (await import("./floor")).assertFloorAccess({
+      sql,
+      discord: data.discord,
+      passChain: data.passChain,
+      passAddress: data.passAddress,
+      listingCoin: row.coin,
+      listingWallet: data.wallet,
+    });
     const created = await sql<{ id: number }>`
       insert into takes (listing_id, discord, wallet, notes, status)
       values (${data.listingId}, ${data.discord}, ${data.wallet}, ${data.notes}, 'open')
